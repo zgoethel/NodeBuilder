@@ -13,8 +13,7 @@ internal static class Program
         var services = new ServiceCollection();
 
         services.AddWindowsFormsBlazorWebView();
-        services.AddSingleton<WindowRegistry>();
-        services.AddTransient<Form1>();
+        services.AddTransient<HomeForm>();
         services.AddTransient<Form2>();
         services.AddTransient<Form3>();
 
@@ -23,6 +22,6 @@ internal static class Program
         // To customize application configuration such as set high DPI settings or default font,
         // see https://aka.ms/applicationconfiguration.
         ApplicationConfiguration.Initialize();
-        Application.Run(sp.GetRequiredService<Form1>());
+        Application.Run(sp.GetRequiredService<HomeForm>());
     }
 }

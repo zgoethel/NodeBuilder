@@ -1,0 +1,139 @@
+@implements IDisposable
+@inject IServiceProvider sp
+@inject WindowRegistry windowRegistry
+
+<div class="p-3">
+
+    <h1 style="@Styling">Hello, world!</h1>
+
+    <button class="btn btn-primary mb-3" @onclick="@BreakTheFourthWall">
+        Break the fourth wall
+    </button>
+
+    <button class="btn btn-secondary mb-3" @onclick="@NextWindow">
+        Next window
+    </button>
+
+    <button class="btn btn-outline-secondary mb-3" @onclick="@FocusOnMe">
+        Focus on me
+    </button>
+
+    <button class="btn btn-outline-warning mb-3" @onclick="@TimeTravel">
+        Time travel
+    </button>
+
+    <button class="btn btn-outline-danger mb-3" @onclick="@TimeTravel2">
+        Time travel
+    </button>
+
+    <br />
+
+    @if (FriendMetDubiousFate)
+    {
+        <div style="@UPSET_STYLING">
+            <h1>D:</h1>
+        </div>
+        <h1><strong>You killed my friend!!</strong></h1>
+
+        <br />
+    }
+
+    @if (ActiveFormIsInvisible)
+    {
+        <h1>The active form is invisible <strong>:/</strong></h1>
+
+        <br />
+    }
+
+    <select class="form-select">
+        <option>A</option>
+        <option>B</option>
+        <option>C</option>
+        <option>D</option>
+        <option>E</option>
+        <option>F</option>
+    </select>
+
+</div>
+
+@code {
+        const string ACTIVE_STYLING = "background: red;color: white;font-weight: bold;";
+        const string UPSET_STYLING = "transform: translateY(-1rem) rotate(-90deg);width: 100px;";
+
+        [Parameter]
+        public int Index { get; set; }
+
+    private string Styling => windowRegistry.FormIndex == Index ? ACTIVE_STYLING : "";
+
+    private bool FriendMetDubiousFate => windowRegistry.AllForms.Any((it) => !it.Visible);
+
+    private bool ActiveFormIsInvisible => !windowRegistry.AllForms[windowRegistry.FormIndex].Visible;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        FocusOnMe();
+        windowRegistry.FormIndexChanged += OnFormIndexChanged;
+    }
+
+    void IDisposable.Dispose()
+    {
+        windowRegistry.FormIndexChanged -= OnFormIndexChanged;
+        // Notify brethren of fate
+        windowRegistry.FormIndex += 0;
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+
+        if (firstRender)
+        {
+            windowRegistry.AllForms[windowRegistry.FormIndex].Opacity = 0.9;
+        }
+    }
+
+    private void OnFormIndexChanged(int newIndex)
+    {
+        _ = InvokeAsync(StateHasChanged);
+    }
+
+    private void BreakTheFourthWall()
+    {
+        var nextForm = sp.GetRequiredService<Form1>();
+        nextForm.Show();
+    }
+
+    private void NextWindow()
+    {
+        windowRegistry.FormIndex = (windowRegistry.FormIndex + 1) % windowRegistry.AllForms.Count;
+    }
+
+    private void FocusOnMe()
+    {
+        windowRegistry.FormIndex = Index;
+    }
+
+    private void TimeTravel()
+    {
+        System.Threading.SynchronizationContext.Current!.Post(
+            (_) =>
+            {
+                var nextForm = sp.GetRequiredService<Form2>();
+                nextForm.ShowDialog();
+            },
+            null);
+    }
+
+    private void TimeTravel2()
+    {
+        System.Threading.SynchronizationContext.Current!.Post(
+            (_) =>
+            {
+                var nextForm = sp.GetRequiredService<Form3>();
+                nextForm.ShowDialog();
+            },
+            null);
+    }
+}

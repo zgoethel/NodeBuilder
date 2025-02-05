@@ -1,0 +1,8 @@
+* {
+    font-family: cursive;
+    user-select: none;
+}
+
+input {
+    user-select: unset;
+}

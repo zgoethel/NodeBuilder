@@ -14,8 +14,7 @@ internal static class Program
 
         services.AddWindowsFormsBlazorWebView();
         services.AddTransient<HomeForm>();
-        services.AddTransient<Form2>();
-        services.AddTransient<Form3>();
+        services.AddTransient<EditTokenForm>();
 
         var sp = services.BuildServiceProvider();
 

@@ -6,8 +6,6 @@
 
     <button class="btn btn-primary" @onclick="@TimeTravel">Time travel</button>
 
-    <button class="btn btn-outline-secondary" @onclick="@TimeTravel2">Time travel 2</button>
-
 </div>
 
 @code {
@@ -26,13 +24,7 @@
 
     private void TimeTravel()
     {
-        var nextForm = sp.GetRequiredService<Form2>();
-        nextForm.ShowDialogSynchronized();
-    }
-
-    private void TimeTravel2()
-    {
-        var nextForm = sp.GetRequiredService<Form3>();
+        var nextForm = sp.GetRequiredService<EditTokenForm>();
         nextForm.ShowDialogSynchronized();
     }
 }

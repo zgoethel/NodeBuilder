@@ -61,7 +61,7 @@
             matchField.Name = "matchField";
             matchField.ReadOnly = true;
             matchField.Size = new Size(237, 23);
-            matchField.TabIndex = 7;
+            matchField.TabIndex = 5;
             // 
             // exactCheck
             // 
@@ -70,7 +70,7 @@
             exactCheck.Location = new Point(249, 26);
             exactCheck.Name = "exactCheck";
             exactCheck.Size = new Size(53, 19);
-            exactCheck.TabIndex = 6;
+            exactCheck.TabIndex = 4;
             exactCheck.Text = "Exact";
             exactCheck.UseVisualStyleBackColor = true;
             exactCheck.CheckedChanged += exactCheck_CheckedChanged;
@@ -81,7 +81,7 @@
             testInputField.Location = new Point(6, 22);
             testInputField.Name = "testInputField";
             testInputField.Size = new Size(237, 23);
-            testInputField.TabIndex = 5;
+            testInputField.TabIndex = 3;
             testInputField.TextChanged += testInputField_TextChanged;
             // 
             // saveButton
@@ -90,7 +90,7 @@
             saveButton.Location = new Point(12, 180);
             saveButton.Name = "saveButton";
             saveButton.Size = new Size(308, 23);
-            saveButton.TabIndex = 0;
+            saveButton.TabIndex = 6;
             saveButton.Text = "Save";
             saveButton.UseVisualStyleBackColor = true;
             saveButton.Click += saveButton_Click;
@@ -110,7 +110,7 @@
             regexField.Location = new Point(12, 27);
             regexField.Name = "regexField";
             regexField.Size = new Size(227, 23);
-            regexField.TabIndex = 3;
+            regexField.TabIndex = 1;
             regexField.TextChanged += regexField_TextChanged;
             // 
             // validationLabel
@@ -128,7 +128,7 @@
             cancelButton.Location = new Point(12, 209);
             cancelButton.Name = "cancelButton";
             cancelButton.Size = new Size(308, 23);
-            cancelButton.TabIndex = 5;
+            cancelButton.TabIndex = 7;
             cancelButton.Text = "Cancel";
             cancelButton.UseVisualStyleBackColor = true;
             cancelButton.Click += cancelButton_Click;
@@ -140,7 +140,7 @@
             minimizeButton.Location = new Point(245, 27);
             minimizeButton.Name = "minimizeButton";
             minimizeButton.Size = new Size(75, 23);
-            minimizeButton.TabIndex = 6;
+            minimizeButton.TabIndex = 2;
             minimizeButton.Text = "Minimize";
             minimizeButton.UseVisualStyleBackColor = true;
             minimizeButton.Click += minimizeButton_Click;

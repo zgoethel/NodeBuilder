@@ -41,7 +41,10 @@ public partial class EditTokenForm : Form
     {
         fsa = fsa.ConvertToDfa().MinimizeDfa();
 
+        MessageBox.Show($"Resulting DFA has {fsa.Flat.Count} states.", "Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
         minimizeButton.Enabled = false;
+        testInputField.Focus();
 
         EvaluateTestMatch();
     }
@@ -84,6 +87,8 @@ public partial class EditTokenForm : Form
     {
         try
         {
+            minimizeButton.Enabled = false;
+
             fsa = new();
             fsa.Build(regexField.Text, 1);
 

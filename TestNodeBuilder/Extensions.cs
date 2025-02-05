@@ -1,11 +1,19 @@
-﻿using System.Threading;
-
-namespace TestNodeBuilder;
+﻿namespace TestNodeBuilder;
 
 public static class Extensions
 {
-    public static void ShowDialogSynchronized(this Form form)
+    public static async Task<DialogResult> ShowDialogAsync(this Form form)
     {
-        SynchronizationContext.Current!.Post((_) => form.ShowDialog(), null);
+        TaskCompletionSource<DialogResult> task = new();
+
+        SynchronizationContext.Current!.Post(
+            (_) =>
+            {
+                var dialogResult = form.ShowDialog();
+                task.SetResult(dialogResult);
+            },
+            null);
+
+        return await task.Task;
     }
 }

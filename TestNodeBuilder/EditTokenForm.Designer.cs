@@ -161,7 +161,8 @@
             Controls.Add(testRegexGroup);
             FormBorderStyle = FormBorderStyle.FixedToolWindow;
             Name = "EditTokenForm";
-            Text = "Grammar Tokens";
+            Text = "Edit Token";
+            Load += EditTokenForm_Load;
             testRegexGroup.ResumeLayout(false);
             testRegexGroup.PerformLayout();
             ResumeLayout(false);

@@ -20,7 +20,7 @@ public partial class Fsa
         // Used for deterministic paths
         var node = this;
         // Used once determinism ends
-        List<Fsa> closure = null;
+        List<Fsa>? closure = null;
         int textIndex = startIndex, longestEnd = -1, match = 0;
         var nfaMode = false;
 
@@ -29,13 +29,13 @@ public partial class Fsa
             if (!nfaMode && (node?.Epsilon?.Count ?? 0) > 0)
             {
                 nfaMode = true;
-                closure = node.EpsilonClosure().Distinct().ToList();
+                closure = node!.EpsilonClosure().Distinct().ToList();
             }
 
             if (nfaMode)
             {
                 // Any accept state in the frontier is a valid match
-                var acceptState = closure.Where((it) => it.Accepts.Count > 0).ToList();
+                var acceptState = closure!.Where((it) => it.Accepts.Count > 0).ToList();
                 if (acceptState.Count > 0)
                 {
                     longestEnd = textIndex;
@@ -43,7 +43,7 @@ public partial class Fsa
                 }
 
                 // "Invalid state" due to end of input or lack of next states
-                if (textIndex >= text.Length || closure.Count == 0)
+                if (textIndex >= text.Length || closure!.Count == 0)
                 {
                     break;
                 }
@@ -53,7 +53,7 @@ public partial class Fsa
                 if ((node?.Accepts?.Count ?? 0) > 0)
                 {
                     longestEnd = textIndex;
-                    match = node.Accepts.Min();
+                    match = node!.Accepts.Min();
                 }
 
                 // "Invalid state" due to end of input or lack of next states
@@ -66,11 +66,11 @@ public partial class Fsa
             var c = text[textIndex++];
             if (nfaMode)
             {
-                var frontier = closure.SelectMany((it) => it.AdjacentSet(c)).Distinct();
+                var frontier = closure!.SelectMany((it) => it.AdjacentSet(c)).Distinct();
                 closure = frontier.SelectMany((it) => it.EpsilonClosure()).Distinct().ToList();
             } else
             {
-                node = node.Next.GetValueOrDefault(c);
+                node = node!.Next.GetValueOrDefault(c);
             }
         }
 

@@ -10,7 +10,7 @@
 
 @code {
     [Parameter]
-    public HomeForm Form { get; set; }
+    public HomeForm? Form { get; set; }
 
     protected override void OnAfterRender(bool firstRender)
     {
@@ -18,13 +18,13 @@
 
         if (firstRender)
         {
-            Form.Opacity = 1.0;
+            Form!.Opacity = 1.0;
         }
     }
 
-    private void TimeTravel()
+    private async Task TimeTravel()
     {
         var nextForm = sp.GetRequiredService<EditTokenForm>();
-        nextForm.ShowDialogSynchronized();
+        var token = await nextForm.ShowEditTokenForm("test", (_) => "Nope!");
     }
 }

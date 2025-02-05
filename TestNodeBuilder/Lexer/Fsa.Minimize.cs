@@ -199,9 +199,9 @@ public partial class Fsa
         {
         }
 
-        public bool Equals(IDictionary<TKey, TValue> x, IDictionary<TKey, TValue> y)
+        public bool Equals(IDictionary<TKey, TValue>? x, IDictionary<TKey, TValue>? y)
         {
-            if (x.Count != y.Count)
+            if (x!.Count != y!.Count)
                 return false;
             // Original code does not properly resolve hash collisions
             //return GetHashCode(x) == GetHashCode(y);
@@ -214,7 +214,7 @@ public partial class Fsa
             int hash = 0;
             foreach (KeyValuePair<TKey, TValue> pair in obj)
             {
-                int key = pair.Key.GetHashCode();
+                int key = pair.Key!.GetHashCode();
                 int value = pair.Value != null ? pair.Value.GetHashCode() : 0;
                 hash ^= ShiftAndWrap(key, 2) ^ value;
             }

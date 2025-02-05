@@ -9,7 +9,7 @@ public partial class Fsa
         Whitespace
     }
 
-    private static Fsa _CommonMatcher;
+    private static Fsa? _CommonMatcher;
     public static Fsa CommonMatcher
     {
         get
@@ -23,7 +23,7 @@ public partial class Fsa
 
                 _CommonMatcher = commonMatcher.ConvertToDfa().MinimizeDfa();
             }
-            return _CommonMatcher;
+            return _CommonMatcher!;
         }
     }
 }

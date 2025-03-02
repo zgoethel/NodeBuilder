@@ -55,25 +55,38 @@ internal static class Program
             var literal = Production.Literal(
                 [(int)_Token.Number]);
             var parens = Production.Body(
-                (int)_Token.OpenParens, (int)_Token.CloseParens,
+                (int)_Token.OpenParens,
+                (int)_Token.CloseParens,
                 (a, b) => expr!.Invoke(a, b));
             var member = Production.FirstSet(
                 null,
                 ((int)_Token.OpenParens, parens),
                 ((int)_Token.Number, literal));
 
-            var exprA = Production.InfixOperator(
-                [(int)_Token.Deref, (int)_Token.Access, (int)_Token.Invoke /*TEMP*/],
+            var exprA = Production.InfixPostfixOperator(
+                [
+                    ((int)_Token.Deref, true),
+                    ((int)_Token.Access, true),
+                    ((int)_Token.Invoke, false)
+                ],
                 member);
-            var exprB = Production.InfixOperator(
-                [(int)_Token.Exponent],
+            var exprB = Production.InfixPostfixOperator(
+                [
+                    ((int)_Token.Exponent, true)
+                ],
                 exprA,
                 assoc: SD.Associativity.Right);
-            var exprC = Production.InfixOperator(
-                [(int)_Token.Multiply, (int)_Token.Divide],
+            var exprC = Production.InfixPostfixOperator(
+                [
+                    ((int)_Token.Multiply, true),
+                    ((int)_Token.Divide, true)
+                ],
                 exprB);
-            var exprD = Production.InfixOperator(
-                [(int)_Token.Add, (int)_Token.Subtract],
+            var exprD = Production.InfixPostfixOperator(
+                [
+                    ((int)_Token.Add, true),
+                    ((int)_Token.Subtract, true)
+                ],
                 exprC);
 
             expr = exprD;

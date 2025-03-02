@@ -1,4 +1,6 @@
-﻿namespace TestNodeBuilder.Parser;
+﻿using TestNodeBuilder.Models;
+
+namespace TestNodeBuilder.Parser;
 
 public static class Production
 {
@@ -27,7 +29,7 @@ public static class Production
         };
     }
 
-    public class BinaryOperatorDto
+    public class InfixPostfixOperatorDto
     {
         public class Member
         {
@@ -43,11 +45,11 @@ public static class Production
         public List<Member> Members { get; set; } = [];
     }
 
-    public static Trampoline.WorkUnit InfixOperator(int[] opTokens, Trampoline.WorkUnit nextPrecedence, SD.Associativity assoc = SD.Associativity.Left)
+    public static Trampoline.WorkUnit InfixPostfixOperator((int t, bool r)[] opTokens, Trampoline.WorkUnit nextPrecedence, SD.Associativity assoc = SD.Associativity.Left)
     {
         return (addWork, addTail) =>
         {
-            var result = new BinaryOperatorDto()
+            var result = new InfixPostfixOperatorDto()
             {
                 Assoc = assoc
             };
@@ -59,21 +61,19 @@ public static class Production
             {
                 if (first)
                 {
-                    first = false;
-
                     if (left.Result is null)
                     {
                         //TODO Emit error
-                    } else
-                    {
-                        result.Members.Add(new()
-                        {
-                            Value = left.Result
-                        });
                     }
+                    result.Members.Add(new()
+                    {
+                        Value = left.Result
+                    });
                 }
+                first = false;
 
-                if (!opTokens.Contains(ParserContext.TokenStream.Next))
+                var op = opTokens.FirstOrDefault((it) => it.t == ParserContext.TokenStream.Next);
+                if (op.t == 0)
                 {
                     return result.Members.Count switch
                     {
@@ -86,21 +86,24 @@ public static class Production
                 var token = ParserContext.TokenStream.Poll();
                 var text = ParserContext.TokenStream.Text;
 
-                var right = addWork(nextPrecedence);
+                Trampoline.WorkUnitResult? right = null;
+                if (op.r)
+                {
+                    right = addWork(nextPrecedence);
+                }
 
                 addTail(rightTail);
                 addTail((addWork, addTail) =>
                 {
-                    if (right.Result is null)
+                    if (op.r && right!.Result is null)
                     {
                         //TODO Emit error
                     }
-
                     result.Members.Add(new()
                     {
                         OpText = text,
                         OpToken = token,
-                        Value = right.Result
+                        Value = right?.Result
                     });
 
                     return null;

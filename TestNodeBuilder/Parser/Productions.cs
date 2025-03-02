@@ -1,6 +1,4 @@
-﻿using TestNodeBuilder.Models;
-
-namespace TestNodeBuilder.Parser;
+﻿namespace TestNodeBuilder.Parser;
 
 public static class Production
 {

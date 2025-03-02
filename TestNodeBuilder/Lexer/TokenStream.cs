@@ -92,6 +92,12 @@ public class TokenStream(Fsa grammar, string source)
 
         Offset += Text.Length;
 
+        // Always consume at least one character to avoid infinite loops
+        if (Text.Length == 0 && Offset < Source.Length)
+        {
+            Offset++;
+        }
+
         return token;
     }
 }

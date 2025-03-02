@@ -74,13 +74,17 @@ public static class Production
         public string OpText { get; set; } = "";
 
         public object? Value { get; set; }
+
+        public object? Data { get; set; }
     }
 
-    public static Trampoline.WorkUnit PrefixOperator(int[] opTokens, Trampoline.WorkUnit nextPrecedence)
+    public static Trampoline.WorkUnit PrefixOperator((int t, Trampoline.WorkUnit? w)[] opTokens, Trampoline.WorkUnit nextPrecedence)
     {
         return (addWork, addTail) =>
         {
-            if (!opTokens.Contains(ParserContext.TokenStream.Next))
+            if (!opTokens
+                .Select((it) => it.t)
+                .Contains(ParserContext.TokenStream.Next))
             {
                 var value = addWork(nextPrecedence);
 
@@ -92,24 +96,47 @@ public static class Production
                 return null;
             }
 
-            var token = ParserContext.TokenStream.Poll();
+            var token = ParserContext.TokenStream.Next;
             var text = ParserContext.TokenStream.Text;
+
+            var op = opTokens.First((it) => it.t == token);
+
+            var result = new PrefixOperatorDto()
+            {
+                OpToken = token,
+                OpText = text
+            };
 
             var nextPrefix = addWork(PrefixOperator(opTokens, nextPrecedence));
 
+            // Executed last
+            // Effective return value
             addTail((addWork, addTail) =>
             {
                 if (nextPrefix.Result is null)
                 {
                     //TODO Emit error
                 }
-                return new PrefixOperatorDto()
-                {
-                    OpToken = token,
-                    OpText = text,
-                    Value = nextPrefix.Result
-                };
+                result.Value = nextPrefix.Result;
+
+                return result;
             });
+
+            // Executed first
+            if (op.w is null)
+            {
+                ParserContext.TokenStream.Poll();
+            } else
+            {
+                var opResult = addWork(op.w!);
+
+                addTail((addWork, addTail) =>
+                {
+                    result.Data = opResult.Result;
+
+                    return null;
+                });
+            }
 
             return null;
         };
@@ -160,9 +187,13 @@ public static class Production
                 }
                 first = false;
 
-                var op = opTokens.FirstOrDefault((it) => it.t == ParserContext.TokenStream.Next);
+                var token = ParserContext.TokenStream.Next;
+                var text = ParserContext.TokenStream.Text;
+
+                var op = opTokens.FirstOrDefault((it) => it.t == token);
                 if (op.t == 0)
                 {
+                    // Effective return value (stop condition)
                     return result.Members.Count switch
                     {
                         0 => null,
@@ -171,10 +202,11 @@ public static class Production
                     };
                 }
 
-                var token = ParserContext.TokenStream.Next;
-                var text = ParserContext.TokenStream.Text;
-
-                object? opData = null;
+                var member = new InfixPostfixOperatorDto.Member()
+                {
+                    OpText = text,
+                    OpToken = token
+                };
 
                 // Executed last (outer)
                 // Effective return value (outer)
@@ -196,13 +228,8 @@ public static class Production
                         {
                             //TODO Emit error
                         }
-                        result.Members.Add(new()
-                        {
-                            OpText = text,
-                            OpToken = token,
-                            Value = right?.Result,
-                            Data = opData
-                        });
+                        member.Value = right?.Result;
+                        result.Members.Add(member);
 
                         return null;
                     });
@@ -220,7 +247,7 @@ public static class Production
 
                     addTail((addWork, addTail) =>
                     {
-                        opData = opResult.Result;
+                        member.Data = opResult.Result;
 
                         return null;
                     });

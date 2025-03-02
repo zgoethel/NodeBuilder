@@ -15,6 +15,7 @@ public static class Production
         {
             if (!litTokens.Contains(ParserContext.TokenStream.Next))
             {
+                //TODO Emit error
                 return null;
             }
 
@@ -53,24 +54,29 @@ public static class Production
 
             var left = addWork(nextPrecedence);
 
-            object? rightTail(Trampoline.WorkBuilder addWork, Trampoline.WorkBuilder addTail)
+            addWork((addWork, addTail) =>
             {
-                if (result.Members.Count == 0)
+                if (left.Result is null)
                 {
-                    if (left.Result is null)
-                    {
-                        return null;
-                    }
+                    //TODO Emit error
+                } else
+                {
                     result.Members.Add(new()
                     {
                         Value = left.Result
                     });
                 }
 
+                return null;
+            });
+
+            object? rightTail(Trampoline.WorkBuilder addWork, Trampoline.WorkBuilder addTail)
+            {
                 if (!opTokens.Contains(ParserContext.TokenStream.Next))
                 {
                     return result.Members.Count switch
                     {
+                        0 => null,
                         1 => result.Members.Single().Value,
                         _ => result
                     };
@@ -81,6 +87,7 @@ public static class Production
 
                 var right = addWork(nextPrecedence);
 
+                addTail(rightTail);
                 addTail((addWork, addTail) =>
                 {
                     if (right.Result is null)
@@ -95,10 +102,10 @@ public static class Production
                         Value = right.Result
                     });
 
-                    return rightTail(addWork, addTail);
+                    return null;
                 });
 
-                return result;
+                return null;
             };
 
             addTail(rightTail);

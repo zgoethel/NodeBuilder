@@ -114,4 +114,58 @@ public static class Production
             return null;
         };
     }
+
+    public static Trampoline.WorkUnit FirstSet(Trampoline.WorkUnit? fallback, params (int, Trampoline.WorkUnit)[] options)
+    {
+        return (addWork, addTail) =>
+        {
+            var token = ParserContext.TokenStream.Next;
+            var matchingUnit = options.FirstOrDefault((it) => it.Item1 == token).Item2 ?? fallback;
+
+            if (matchingUnit is null)
+            {
+                //TODO Emit error
+                return null;
+            } else
+            {
+                return matchingUnit(addWork, addTail);
+            }
+        };
+    }
+
+    public static Trampoline.WorkUnit Body(int startToken, int endToken, Trampoline.WorkUnit content)
+    {
+        return (addWork, addTail) =>
+        {
+            if (ParserContext.TokenStream.Next != startToken)
+            {
+                //TODO Emit error
+            } else
+            {
+                ParserContext.TokenStream.Poll();
+            }
+
+            var contentResult = addWork(content);
+
+            addTail((addWork, addTail) =>
+            {
+                if (contentResult.Result is null)
+                {
+                    //TODO Emit error
+                }
+
+                if (ParserContext.TokenStream.Next != endToken)
+                {
+                    //TODO Emit error
+                } else
+                {
+                    ParserContext.TokenStream.Poll();
+                }
+
+                return contentResult.Result;
+            });
+
+            return null;
+        };
+    }
 }

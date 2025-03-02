@@ -31,6 +31,7 @@ internal static class Program
         _ = Task.Run(async () =>
         {
             var fsa = new Fsa();
+
             fsa.Build("[0-9]+", (int)_Token.Number);
             fsa.Build("\\+", (int)_Token.Add);
             fsa.Build("\\-\\>", (int)_Token.Deref);
@@ -46,14 +47,24 @@ internal static class Program
 
             fsa = fsa.ConvertToDfa().MinimizeDfa();
 
-            var source = "1 + 2.3.4()->5 * 6->7 / 8^9^10";
+            var source = "((1 + 2).3.4()->5) * 6->7 / (8^9)^10";
             var stream = new TokenStream(fsa, source);
+
+            Trampoline.WorkUnit? expr = null;
 
             var literal = Production.Literal(
                 [(int)_Token.Number]);
+            var parens = Production.Body(
+                (int)_Token.OpenParens, (int)_Token.CloseParens,
+                (a, b) => expr!.Invoke(a, b));
+            var member = Production.FirstSet(
+                null,
+                ((int)_Token.OpenParens, parens),
+                ((int)_Token.Number, literal));
+
             var exprA = Production.InfixOperator(
-                [(int)_Token.Deref, (int)_Token.Access, (int)_Token.Invoke],
-                literal);
+                [(int)_Token.Deref, (int)_Token.Access, (int)_Token.Invoke /*TEMP*/],
+                member);
             var exprB = Production.InfixOperator(
                 [(int)_Token.Exponent],
                 exprA,
@@ -64,11 +75,12 @@ internal static class Program
             var exprD = Production.InfixOperator(
                 [(int)_Token.Add, (int)_Token.Subtract],
                 exprC);
-            var expr = exprD;
+
+            expr = exprD;
 
             var parserOutput = await ParserContext.Begin(
                 stream,
-                async () => await Trampoline.Execute(expr, CancellationToken.None));
+                async () => await Trampoline.Execute(expr!, CancellationToken.None));
 
             //TODO Emit error if tokens remain
 

@@ -53,7 +53,7 @@ public static class Production
 
             void pushOperator()
             {
-                var opToken = addTail((addWork, addTail) =>
+                addTail((addWork, addTail) =>
                 {
                     if (!opTokens.Contains(ParserContext.TokenStream.Next))
                     {
@@ -80,7 +80,7 @@ public static class Production
                             OpText = text,
                             Value = right
                         });
-                        return right;
+                        return null;
                     });
 
                     return null;
@@ -101,7 +101,7 @@ public static class Production
                 {
                     Value = left
                 });
-                return left;
+                return null;
             });
 
             return result;

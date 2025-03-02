@@ -30,10 +30,11 @@ internal static class Program
             fsa.Build("\\-", (int)_Token.Subtract);
             fsa.Build("\\*", (int)_Token.Multiply);
             fsa.Build("\\/", (int)_Token.Divide);
+            fsa.Build("[ \n\r\t]+", 9999);
 
             fsa = fsa.ConvertToDfa().MinimizeDfa();
 
-            var source = "1+2*3/4-5-6*7*8";
+            var source = "1 + 2 * 3 / 4 - 5 - 6 * 7 * 8";
             var stream = new TokenStream(fsa, source);
 
             var literal = Production.Literal([(int)_Token.Number]);

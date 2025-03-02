@@ -19,7 +19,8 @@ internal static class Program
         Invoke,
         Exponent,
         OpenParens,
-        CloseParens
+        CloseParens,
+        Not
     }
 
     /// <summary>
@@ -43,11 +44,12 @@ internal static class Program
             fsa.Build("\\^", (int)_Token.Exponent);
             fsa.Build("\\(", (int)_Token.OpenParens);
             fsa.Build("\\)", (int)_Token.CloseParens);
+            fsa.Build("\\!", (int)_Token.Not);
             fsa.Build("[ \n\r\t]+", 9999);
 
             fsa = fsa.ConvertToDfa().MinimizeDfa();
 
-            var source = "((1 + 2).3.4()->5) * 6->7 / (8^9)^10";
+            var source = "((1 + 2).3.4()->5) * !!6->7 / (8^9)^10.11^(12)";
             var stream = new TokenStream(fsa, source);
 
             Trampoline.WorkUnit? expr = null;
@@ -76,20 +78,23 @@ internal static class Program
                 ],
                 exprA,
                 assoc: SD.Associativity.Right);
-            var exprC = Production.InfixPostfixOperator(
+            var exprC = Production.PrefixOperator(
+                [(int)_Token.Not],
+                exprB);
+            var exprD = Production.InfixPostfixOperator(
                 [
                     ((int)_Token.Multiply, true),
                     ((int)_Token.Divide, true)
                 ],
-                exprB);
-            var exprD = Production.InfixPostfixOperator(
+                exprC);
+            var exprE = Production.InfixPostfixOperator(
                 [
                     ((int)_Token.Add, true),
                     ((int)_Token.Subtract, true)
                 ],
-                exprC);
+                exprD);
 
-            expr = exprD;
+            expr = exprE;
 
             var parserOutput = await ParserContext.Begin(
                 stream,

@@ -4,6 +4,25 @@ namespace TestNodeBuilder.Parser;
 
 public static class Production
 {
+    public static Trampoline.WorkUnit FirstSet(Trampoline.WorkUnit? fallback, params (int, Trampoline.WorkUnit)[] options)
+    {
+        return (addWork, addTail) =>
+        {
+            var token = ParserContext.TokenStream.Next;
+            var matchingUnit = options.FirstOrDefault((it) => it.Item1 == token).Item2 ?? fallback;
+
+            if (matchingUnit is null)
+            {
+                //TODO Emit error
+                return null;
+            }
+            else
+            {
+                return matchingUnit(addWork, addTail);
+            }
+        };
+    }
+
     public class LiteralDto
     {
         public int Token { get; set; }
@@ -26,6 +45,47 @@ public static class Production
                 Token = ParserContext.TokenStream.Poll(),
                 Text = ParserContext.TokenStream.Text
             };
+        };
+    }
+
+    public class PrefixOperatorDto
+    {
+        public int OpToken { get; set; }
+
+        public string OpText { get; set; } = "";
+
+        public object? Value { get; set; }
+    }
+
+    public static Trampoline.WorkUnit PrefixOperator(int[] opTokens, Trampoline.WorkUnit nextPrecedence)
+    {
+        return (addWork, addTail) =>
+        {
+            if (!opTokens.Contains(ParserContext.TokenStream.Next))
+            {
+                return nextPrecedence(addWork, addTail);
+            }
+
+            var token = ParserContext.TokenStream.Poll();
+            var text = ParserContext.TokenStream.Text;
+
+            var value = addWork(PrefixOperator(opTokens, nextPrecedence));
+
+            addTail((addWork, addTail) =>
+            {
+                if (value.Result is null)
+                {
+                    //TODO Emit error
+                }
+                return new PrefixOperatorDto()
+                {
+                    OpToken = token,
+                    OpText = text,
+                    Value = value.Result
+                };
+            });
+
+            return null;
         };
     }
 
@@ -115,24 +175,6 @@ public static class Production
             addTail(rightTail);
 
             return null;
-        };
-    }
-
-    public static Trampoline.WorkUnit FirstSet(Trampoline.WorkUnit? fallback, params (int, Trampoline.WorkUnit)[] options)
-    {
-        return (addWork, addTail) =>
-        {
-            var token = ParserContext.TokenStream.Next;
-            var matchingUnit = options.FirstOrDefault((it) => it.Item1 == token).Item2 ?? fallback;
-
-            if (matchingUnit is null)
-            {
-                //TODO Emit error
-                return null;
-            } else
-            {
-                return matchingUnit(addWork, addTail);
-            }
         };
     }
 

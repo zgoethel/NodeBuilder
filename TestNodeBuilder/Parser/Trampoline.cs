@@ -2,13 +2,16 @@
 
 public static class Trampoline
 {
-    public delegate object? WorkUnit(Func<WorkUnit, WorkUnitResult> addWork, Func<WorkUnit, WorkUnitResult> addTail);
+    public delegate WorkUnitResult WorkBuilder(WorkUnit work);
+    public delegate object? WorkUnit(WorkBuilder addWork, WorkBuilder addTail);
 
-    public class WorkUnitResult(WorkUnit work)
+    public class WorkUnitResult(WorkUnit work, WorkUnitResult? parent = null)
     {
         public WorkUnit Work { get; } = work;
 
         public object? Result { get; set; }
+
+        public WorkUnitResult? Parent { get; set; } = parent;
     }
 
     public static async Task<object?> Execute(WorkUnit initialWork, CancellationToken cancel)
@@ -24,9 +27,9 @@ public static class Trampoline
             return result;
         }
 
-        WorkUnitResult addTail(WorkUnit w)
+        WorkUnitResult addTail(WorkUnit w, WorkUnitResult? parent = null)
         {
-            var result = new WorkUnitResult(w);
+            var result = new WorkUnitResult(w, parent: parent);
             tails.Push(result);
 
             return result;
@@ -42,7 +45,9 @@ public static class Trampoline
                 if (work.Count > 0)
                 {
                     var doWork = work.Dequeue();
-                    doWork.Result = await Task.Run(() => doWork.Work(addWork, addTail), cancel);
+                    doWork.Result = await Task.Run(
+                        () => doWork.Work(addWork, (it) => addTail(it, parent: doWork)),
+                        cancel);
 
                     continue;
                 }
@@ -50,7 +55,14 @@ public static class Trampoline
                 if (tails.Count > 0)
                 {
                     var doWork = tails.Pop();
-                    doWork.Result = await Task.Run(() => doWork.Work(addWork, addTail), cancel);
+                    doWork.Result = await Task.Run(
+                        () => doWork.Work(addWork, (it) => addTail(it, parent: doWork)),
+                        cancel);
+
+                    for (var p = doWork.Parent; p is not null; p = p.Parent)
+                    {
+                        p.Result = doWork.Result;
+                    }
 
                     continue;
                 }

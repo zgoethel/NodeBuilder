@@ -44,7 +44,7 @@ internal static class Program
 
             var parserOutput = await ParserContext.Begin(
                 stream,
-                async () =>  await Trampoline.Execute(expr, CancellationToken.None));
+                async () => await Trampoline.Execute(expr, CancellationToken.None));
 
             //TODO Emit error if tokens remain
 

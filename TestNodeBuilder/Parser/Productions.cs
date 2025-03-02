@@ -51,60 +51,59 @@ public static class Production
                 Assoc = assoc
             };
 
-            void pushOperator()
+            var left = addWork(nextPrecedence);
+
+            object? rightTail(Trampoline.WorkBuilder addWork, Trampoline.WorkBuilder addTail)
             {
-                addTail((addWork, addTail) =>
+                if (result.Members.Count == 0)
                 {
-                    if (!opTokens.Contains(ParserContext.TokenStream.Next))
+                    if (left.Result is null)
                     {
                         return null;
                     }
-
-                    var token = ParserContext.TokenStream.Poll();
-                    var text = ParserContext.TokenStream.Text;
-
-                    addWork((addWork, addTail) =>
+                    result.Members.Add(new()
                     {
-                        var right = nextPrecedence(addWork, addTail);
-                        if (right is null)
-                        {
-                            //TODO Emit error
-                            return null;
-                        }
-
-                        pushOperator();
-
-                        result.Members.Add(new()
-                        {
-                            OpToken = token,
-                            OpText = text,
-                            Value = right
-                        });
-                        return null;
+                        Value = left.Result
                     });
-
-                    return null;
-                });
-            }
-
-            addWork((addWork, addTail) =>
-            {
-                var left = nextPrecedence(addWork, addTail);
-                if (left is null)
-                {
-                    return null;
                 }
 
-                pushOperator();
-
-                result.Members.Add(new()
+                if (!opTokens.Contains(ParserContext.TokenStream.Next))
                 {
-                    Value = left
-                });
-                return null;
-            });
+                    return result.Members.Count switch
+                    {
+                        1 => result.Members.Single().Value,
+                        _ => result
+                    };
+                }
 
-            return result;
+                var token = ParserContext.TokenStream.Poll();
+                var text = ParserContext.TokenStream.Text;
+
+                var right = addWork(nextPrecedence);
+
+                addTail((addWork, addTail) =>
+                {
+                    if (right.Result is null)
+                    {
+                        //TODO Emit error
+                    }
+
+                    result.Members.Add(new()
+                    {
+                        OpText = text,
+                        OpToken = token,
+                        Value = right.Result
+                    });
+
+                    return rightTail(addWork, addTail);
+                });
+
+                return result;
+            };
+
+            addTail(rightTail);
+
+            return null;
         };
     }
 }

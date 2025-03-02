@@ -53,25 +53,26 @@ public static class Production
             };
 
             var left = addWork(nextPrecedence);
-
-            addWork((addWork, addTail) =>
-            {
-                if (left.Result is null)
-                {
-                    //TODO Emit error
-                } else
-                {
-                    result.Members.Add(new()
-                    {
-                        Value = left.Result
-                    });
-                }
-
-                return null;
-            });
+            var first = true;
 
             object? rightTail(Trampoline.WorkBuilder addWork, Trampoline.WorkBuilder addTail)
             {
+                if (first)
+                {
+                    first = false;
+
+                    if (left.Result is null)
+                    {
+                        //TODO Emit error
+                    } else
+                    {
+                        result.Members.Add(new()
+                        {
+                            Value = left.Result
+                        });
+                    }
+                }
+
                 if (!opTokens.Contains(ParserContext.TokenStream.Next))
                 {
                     return result.Members.Count switch

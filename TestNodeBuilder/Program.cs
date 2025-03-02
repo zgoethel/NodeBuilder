@@ -10,10 +10,16 @@ internal static class Program
     enum _Token
     {
         Number = 1,
-        Add = 2,
-        Subtract = 3,
-        Multiply = 4,
-        Divide = 5
+        Add,
+        Subtract,
+        Multiply,
+        Divide,
+        Deref,
+        Access,
+        Invoke,
+        Exponent,
+        OpenParens,
+        CloseParens
     }
 
     /// <summary>
@@ -27,20 +33,38 @@ internal static class Program
             var fsa = new Fsa();
             fsa.Build("[0-9]+", (int)_Token.Number);
             fsa.Build("\\+", (int)_Token.Add);
+            fsa.Build("\\-\\>", (int)_Token.Deref);
             fsa.Build("\\-", (int)_Token.Subtract);
             fsa.Build("\\*", (int)_Token.Multiply);
             fsa.Build("\\/", (int)_Token.Divide);
+            fsa.Build("\\.", (int)_Token.Access);
+            fsa.Build("\\(\\)", (int)_Token.Invoke); //TEMP
+            fsa.Build("\\^", (int)_Token.Exponent);
+            fsa.Build("\\(", (int)_Token.OpenParens);
+            fsa.Build("\\)", (int)_Token.CloseParens);
             fsa.Build("[ \n\r\t]+", 9999);
 
             fsa = fsa.ConvertToDfa().MinimizeDfa();
 
-            var source = "1 + 2 * 3 / 4 - 5 - 6 * 7 * 8";
+            var source = "1 + 2.3.4()->5 * 6->7 / 8^9^10";
             var stream = new TokenStream(fsa, source);
 
-            var literal = Production.Literal([(int)_Token.Number]);
-            var exprA = Production.InfixOperator([(int)_Token.Multiply, (int)_Token.Divide], literal);
-            var exprB = Production.InfixOperator([(int)_Token.Add, (int)_Token.Subtract], exprA);
-            var expr = exprB;
+            var literal = Production.Literal(
+                [(int)_Token.Number]);
+            var exprA = Production.InfixOperator(
+                [(int)_Token.Deref, (int)_Token.Access, (int)_Token.Invoke],
+                literal);
+            var exprB = Production.InfixOperator(
+                [(int)_Token.Exponent],
+                exprA,
+                assoc: SD.Associativity.Right);
+            var exprC = Production.InfixOperator(
+                [(int)_Token.Multiply, (int)_Token.Divide],
+                exprB);
+            var exprD = Production.InfixOperator(
+                [(int)_Token.Add, (int)_Token.Subtract],
+                exprC);
+            var expr = exprD;
 
             var parserOutput = await ParserContext.Begin(
                 stream,

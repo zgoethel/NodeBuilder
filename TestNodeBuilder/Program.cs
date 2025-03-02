@@ -38,8 +38,8 @@ internal static class Program
             var stream = new TokenStream(fsa, source);
 
             var literal = Production.Literal([(int)_Token.Number]);
-            var exprA = Production.BinaryOperator([(int)_Token.Multiply, (int)_Token.Divide], literal);
-            var exprB = Production.BinaryOperator([(int)_Token.Add, (int)_Token.Subtract], exprA);
+            var exprA = Production.InfixOperator([(int)_Token.Multiply, (int)_Token.Divide], literal);
+            var exprB = Production.InfixOperator([(int)_Token.Add, (int)_Token.Subtract], exprA);
             var expr = exprB;
 
             var parserOutput = await ParserContext.Begin(

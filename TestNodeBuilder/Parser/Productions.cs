@@ -43,7 +43,7 @@ public static class Production
         public List<Member> Members { get; set; } = [];
     }
 
-    public static Trampoline.WorkUnit BinaryOperator(int[] opTokens, Trampoline.WorkUnit nextPrecedence, SD.Associativity assoc = SD.Associativity.Left)
+    public static Trampoline.WorkUnit InfixOperator(int[] opTokens, Trampoline.WorkUnit nextPrecedence, SD.Associativity assoc = SD.Associativity.Left)
     {
         return (addWork, addTail) =>
         {

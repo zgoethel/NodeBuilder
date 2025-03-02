@@ -57,11 +57,12 @@ internal static class Program
             var literal = Production.Literal(
                 [(int)_Token.Number]);
             var parens = Production.Body(
-                (int)_Token.OpenParens,
-                (int)_Token.CloseParens,
-                (a, b) => expr!.Invoke(a, b));
+                startToken: (int)_Token.OpenParens,
+                endToken: (int)_Token.CloseParens,
+                content: (a, b) => expr!.Invoke(a, b));
             var member = Production.FirstSet(
-                null,
+                fallback: null,
+                ahead: 0,
                 ((int)_Token.OpenParens, parens),
                 ((int)_Token.Number, literal));
 

@@ -4,22 +4,43 @@ namespace TestNodeBuilder.Parser;
 
 public static class Production
 {
-    public static Trampoline.WorkUnit FirstSet(Trampoline.WorkUnit? fallback, params (int, Trampoline.WorkUnit)[] options)
+    public static Trampoline.WorkUnit FirstSet(Trampoline.WorkUnit? fallback, int ahead, params (int, Trampoline.WorkUnit)[] options)
     {
         return (addWork, addTail) =>
         {
-            var token = ParserContext.TokenStream.Next;
-            var matchingUnit = options.FirstOrDefault((it) => it.Item1 == token).Item2 ?? fallback;
+            var originalOffset = ParserContext.TokenStream.Offset;
+            try
+            {
+                for (var i = 0; i < ahead; i++)
+                {
+                    ParserContext.TokenStream.Poll();
+                }
 
-            if (matchingUnit is null)
+                var token = ParserContext.TokenStream.Next;
+                var matchingUnit = options.FirstOrDefault((it) => it.Item1 == token).Item2 ?? fallback;
+
+                if (matchingUnit is null)
+                {
+                    //TODO Emit error
+                    return null;
+                } else
+                {
+                    var result = addWork(matchingUnit);
+
+                    addTail((addWork, addTail) =>
+                    {
+                        return result.Result;
+                    });
+                }
+            } finally
             {
-                //TODO Emit error
-                return null;
+                if (ParserContext.TokenStream.Offset != originalOffset)
+                {
+                    ParserContext.TokenStream.Seek(originalOffset);
+                }
             }
-            else
-            {
-                return matchingUnit(addWork, addTail);
-            }
+
+            return null;
         };
     }
 
@@ -63,17 +84,24 @@ public static class Production
         {
             if (!opTokens.Contains(ParserContext.TokenStream.Next))
             {
-                return nextPrecedence(addWork, addTail);
+                var value = addWork(nextPrecedence);
+
+                addTail((addWork, addTail) =>
+                {
+                    return value.Result;
+                });
+
+                return null;
             }
 
             var token = ParserContext.TokenStream.Poll();
             var text = ParserContext.TokenStream.Text;
 
-            var value = addWork(PrefixOperator(opTokens, nextPrecedence));
+            var nextPrefix = addWork(PrefixOperator(opTokens, nextPrecedence));
 
             addTail((addWork, addTail) =>
             {
-                if (value.Result is null)
+                if (nextPrefix.Result is null)
                 {
                     //TODO Emit error
                 }
@@ -81,7 +109,7 @@ public static class Production
                 {
                     OpToken = token,
                     OpText = text,
-                    Value = value.Result
+                    Value = nextPrefix.Result
                 };
             });
 

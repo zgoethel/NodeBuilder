@@ -100,7 +100,9 @@ internal static class Program
                 assoc: SD.Associativity.Right);
 
             var exprC = Production.PrefixOperator(
-                [((int)_Token.Not, null)],
+                [
+                    ((int)_Token.Not, null)
+                ],
                 nextPrecedence: exprB);
 
             var exprD = Production.InfixPostfixOperator(

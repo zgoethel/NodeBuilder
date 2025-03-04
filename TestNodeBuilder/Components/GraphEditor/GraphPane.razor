@@ -28,7 +28,7 @@
 
     private double EffectiveScale => MIN_SCALE + (scale + 1) / 2 * (MAX_SCALE - MIN_SCALE);
 
-    private double offsetX, offsetY;
+    private double offsetX = 10, offsetY = 10;
     private bool dragging;
 
     private string ContentStyle => string.Join("",

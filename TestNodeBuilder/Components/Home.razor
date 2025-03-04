@@ -4,14 +4,23 @@
 
     <GraphPane @ref="@graphPane">
 
-        <span class="d-flex flex-column gap-2 p-2 bg-white bg-opacity-75 text-dark align-items-center"
-            style="width: fit-content;border-radius: 0.25cm;height: 1.5cm;
-                   border: 2px solid white;
-                   box-shadow: 0 0.125rem 0.25rem 0.25rem rgba(255, 255, 255, 0.2);">
+        <GraphNode Class="pe-0 bg-dark text-light" HeightCm="1" RightOutput>
 
-            <h2 class="m-0 fw-bolder fst-italic">Test</h2>
+            <h5 class="m-0 fw-bolder fst-italic">
+                Start
+            </h5>
 
-        </span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="currentColor" class="bi bi-arrow-right-short" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M4 8a.5.5 0 0 1 .5-.5h5.793L8.146 5.354a.5.5 0 1 1 .708-.708l3 3a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708-.708L10.293 8.5H4.5A.5.5 0 0 1 4 8" />
+            </svg>
+
+        </GraphNode>
+
+        <GraphNode HeightCm="1" LeftInput RightOutput>
+
+            <h5 class="m-0">Token</h5>
+
+        </GraphNode>
 
     </GraphPane>
 

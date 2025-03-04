@@ -5,15 +5,9 @@
     @onpointerup="@HandlePointerUp"
     @onpointerleave="@HandlePointerUp">
 
-    <div class="graph-pane-content" style="@EffectiveContentStyle">
+    <div class="graph-pane-content" style="@ContentStyle">
 
-        <div class="cm-dots" style="@EffectiveDotsStyle"></div>
-
-        <div style="position: absolute;z-index: -1;left: 0;top: -100px;opacity: 0.5;">
-            <p>@EffectiveContentStyle</p>
-
-            <p>@EffectiveDotsStyle</p>
-        </div>
+        <div class="cm-dots" style="@DotsStyle"></div>
 
         <RenderBarrier @ref="@renderBarrier">
             @ChildContent
@@ -29,7 +23,7 @@
 
     private RenderBarrier? renderBarrier;
 
-    private const double MIN_SCALE = 0.5, MAX_SCALE = 1.4;
+    private const double MIN_SCALE = 0.5, MAX_SCALE = 1.5;
     private double scale;
 
     private double EffectiveScale => MIN_SCALE + (scale + 1) / 2 * (MAX_SCALE - MIN_SCALE);
@@ -37,12 +31,12 @@
     private double offsetX, offsetY;
     private bool dragging;
 
-    private string EffectiveContentStyle => string.Join("",
+    private string ContentStyle => string.Join("",
         $"transform: scale({EffectiveScale:0.000}) translateX({offsetX:0.000}px) translateY({offsetY:0.000}px);",
         $"width: {100.0 / EffectiveScale:0.000}%;",
         $"height: {100.0 / EffectiveScale:0.000}%;");
 
-    private string EffectiveDotsStyle => string.Join("",
+    private string DotsStyle => string.Join("",
         $"left: {-offsetX:0.000}px;",
         $"top: {-offsetY:0.000}px;",
         $"background-position: calc(0.5cm + {offsetX:0.000}px) calc(0.5cm + {offsetY:0.000}px),",
@@ -59,7 +53,7 @@
         shouldRender = false;
     }
 
-    private async void HandleMouseWheel(WheelEventArgs ev)
+    private void HandleMouseWheel(WheelEventArgs ev)
     {
         if (!ev.ShiftKey)
         {
@@ -68,12 +62,12 @@
         }
     }
 
-    private async Task HandlePointerDown()
+    private void HandlePointerDown()
     {
         dragging = true;
     }
 
-    private async Task HandlePointerMove(PointerEventArgs ev)
+    private void HandlePointerMove(PointerEventArgs ev)
     {
         if (dragging)
         {
@@ -83,7 +77,7 @@
         }
     }
 
-    private async Task HandlePointerUp()
+    private void HandlePointerUp()
     {
         dragging = false;
     }

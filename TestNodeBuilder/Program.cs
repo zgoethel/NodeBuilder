@@ -1,8 +1,11 @@
 using Microsoft.Extensions.DependencyInjection;
+using System.Resources;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using TestNodeBuilder.Lexer;
 using TestNodeBuilder.Parser;
+
+[assembly: NeutralResourcesLanguage("en")]
 
 namespace TestNodeBuilder;
 

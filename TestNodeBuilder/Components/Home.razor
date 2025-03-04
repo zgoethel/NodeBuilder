@@ -4,7 +4,14 @@
 
     <GraphPane @ref="@graphPane">
 
-        <button @onclick="@(async () => await graphPane!.Redraw())">@Guid.NewGuid()</button>
+        <span class="d-flex flex-column gap-2 p-2 bg-white bg-opacity-75 text-dark align-items-center"
+            style="width: fit-content;border-radius: 0.25cm;height: 1.5cm;
+                   border: 2px solid white;
+                   box-shadow: 0 0.125rem 0.25rem 0.25rem rgba(255, 255, 255, 0.2);">
+
+            <h2 class="m-0 fw-bolder fst-italic">Test</h2>
+
+        </span>
 
     </GraphPane>
 

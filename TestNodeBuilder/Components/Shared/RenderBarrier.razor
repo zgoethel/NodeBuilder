@@ -1,0 +1,23 @@
+﻿@ChildContent
+
+@code {
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    private bool shouldRender = true;
+
+    protected override bool ShouldRender() => shouldRender;
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+
+        shouldRender = false;
+    }
+
+    public async Task Redraw()
+    {
+        shouldRender = true;
+        await InvokeAsync(StateHasChanged);
+    }
+}

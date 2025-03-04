@@ -1,16 +1,20 @@
 @inject IServiceProvider sp
 
-<div class="p-3">
+<div class="p-3" style="position: relative;height: 100vh;">
 
-    <h1>Hello, world!</h1>
+    <GraphPane @ref="@graphPane">
 
-    <button class="btn btn-primary" @onclick="@TimeTravel">Time travel</button>
+        <button @onclick="@(async () => await graphPane!.Redraw())">@Guid.NewGuid()</button>
+
+    </GraphPane>
 
 </div>
 
 @code {
     [Parameter]
     public HomeForm? Form { get; set; }
+
+    private GraphPane? graphPane;
 
     protected override void OnAfterRender(bool firstRender)
     {
@@ -22,9 +26,9 @@
         }
     }
 
-    private async Task TimeTravel()
+    private async Task EditToken(string regex)
     {
         var nextForm = sp.GetRequiredService<EditTokenForm>();
-        var token = await nextForm.ShowEditTokenForm("test", (_) => "Nope!");
+        var token = await nextForm.ShowEditTokenForm(regex, (_) => "Invalid");
     }
 }

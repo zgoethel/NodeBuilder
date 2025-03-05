@@ -4,23 +4,27 @@
 
     <GraphPane Style="position: absolute;left: 0;top: 0;width: 100%;height: 100%;" @ref="@graphPane">
 
-        <GraphNode Class="pe-0 bg-dark text-light" HeightCm="1" RightOutput>
+        <DragContainer>
+            <GraphNode Class="pe-0 bg-dark text-light" HeightCm="1" RightOutput>
 
-            <h5 class="m-0 fw-bolder fst-italic">
-                Start
-            </h5>
+                <h5 class="m-0 fw-bolder fst-italic">
+                    Start
+                </h5>
 
-            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="currentColor" class="bi bi-arrow-right-short" viewBox="0 0 16 16">
-                <path fill-rule="evenodd" d="M4 8a.5.5 0 0 1 .5-.5h5.793L8.146 5.354a.5.5 0 1 1 .708-.708l3 3a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708-.708L10.293 8.5H4.5A.5.5 0 0 1 4 8" />
-            </svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="currentColor" class="bi bi-arrow-right-short" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M4 8a.5.5 0 0 1 .5-.5h5.793L8.146 5.354a.5.5 0 1 1 .708-.708l3 3a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708-.708L10.293 8.5H4.5A.5.5 0 0 1 4 8" />
+                </svg>
 
-        </GraphNode>
+            </GraphNode>
+        </DragContainer>
 
-        <GraphNode HeightCm="1" LeftInput RightOutput>
+        <DragContainer InitialPosition="(0, 2)">
+            <GraphNode HeightCm="1" LeftInput RightOutput>
 
-            <h5 class="m-0">Token</h5>
+                <h5 class="m-0">Token</h5>
 
-        </GraphNode>
+            </GraphNode>
+        </DragContainer>
 
     </GraphPane>
 

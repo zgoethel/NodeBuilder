@@ -1,0 +1,112 @@
+﻿<div class="drag-container @Class" style="@EffectiveStyle"
+    @onpointerdown:stopPropagation
+    @onpointermove:stopPropagation
+    @onpointerup:stopPropagation>
+
+    <div style="display: contents;"
+        @onpointerdown="@HandlePointerDown"
+        @onpointermove="@HandlePointerMove"
+        @onpointerup="@HandlePointerUp"
+        @onpointerleave="@HandlePointerUp">
+
+        <RenderBarrier @ref="@renderBarrier">
+            @ChildContent
+        </RenderBarrier>
+
+        @if (dragging)
+        {
+            <div class="event-capture">
+            </div>
+        }
+
+    </div>
+
+</div>
+
+@code {
+    [CascadingParameter(Name = "EffectiveScale")]
+    public double? EffectiveScale { get; set; }
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    [Parameter]
+    public string Class { get; set; } = "";
+
+    [Parameter]
+    public string Style { get; set; } = "";
+
+    [Parameter]
+    public (double x, double y)? InitialPosition { get; set; }
+
+    [Parameter]
+    public (double x, double y) Position { get; set; }
+
+    [Parameter]
+    public EventCallback<(double x, double y)> PositionChanged { get; set; }
+
+    [Parameter]
+    public double? StepSize { get; set; } = 0.5;
+
+    private string EffectiveStyle => string.Join("",
+        $"left: {Position.x:0.000}px;",
+        $"top: {Position.y:0.000}px;",
+        dragging ? "cursor: grabbing;" : "",
+        Style);
+
+    private RenderBarrier? renderBarrier;
+    private bool dragging;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        if (InitialPosition.HasValue)
+        {
+            Position = InitialPosition.Value;
+        }
+    }
+
+    private bool shouldRender = true;
+
+    protected override bool ShouldRender() => shouldRender;
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+
+        shouldRender = false;
+    }
+
+    private void HandlePointerDown()
+    {
+        dragging = true;
+        shouldRender = true;
+    }
+
+    private async Task HandlePointerMove(PointerEventArgs ev)
+    {
+        if (dragging)
+        {
+            await PositionChanged.InvokeAsync(Position = (
+                Position.x + ev.MovementX / (EffectiveScale ?? 1),
+                Position.y + ev.MovementY / (EffectiveScale ?? 1)));
+
+            shouldRender = true;
+        }
+    }
+
+    private void HandlePointerUp()
+    {
+        dragging = false;
+        shouldRender = true;
+    }
+
+    public async Task Redraw()
+    {
+        if (renderBarrier is not null)
+        {
+            await renderBarrier.Redraw();
+        }
+    }
+}

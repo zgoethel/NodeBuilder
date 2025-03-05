@@ -1,0 +1,14 @@
+.drag-container {
+    position: absolute;
+    cursor: grab;
+}
+
+.drag-container .event-capture {
+    position: absolute;
+    z-index: 9999;
+    left: -100px;
+    top: -100px;
+    width: calc(100% + 200px);
+    height: calc(100% + 200px);
+    background: transparent;
+}

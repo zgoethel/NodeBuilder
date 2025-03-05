@@ -49,8 +49,12 @@
     public double? StepSize { get; set; } = 0.5;
 
     private string EffectiveStyle => string.Join("",
-        $"left: {Position.x:0.000}px;",
-        $"top: {Position.y:0.000}px;",
+        StepSize.HasValue
+            ? $"left: round({Position.x:0.000}px, {StepSize:0.000}cm);"
+            : $"left: {Position.x:0.000}px;",
+        StepSize.HasValue
+            ? $"top: round({Position.y:0.000}px, {StepSize:0.000}cm);"
+            : $"top: {Position.y:0.000}px;",
         dragging ? "cursor: grabbing;" : "",
         Style);
 

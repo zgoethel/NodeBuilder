@@ -17,5 +17,11 @@ public partial class HomeForm : Form
             {
                 ["Form"] = this
             });
+
+        blazorWebView1.WebView.CoreWebView2InitializationCompleted += (_, _) =>
+        {
+            blazorWebView1.WebView.CoreWebView2.Settings.IsPinchZoomEnabled = false;
+            blazorWebView1.WebView.CoreWebView2.Settings.IsSwipeNavigationEnabled = false;
+        };
     }
 }

@@ -1,17 +1,22 @@
-﻿<div class="graph-pane"
-    @onmousewheel="@HandleMouseWheel"
-    @onpointerdown="@HandlePointerDown"
-    @onpointermove="@HandlePointerMove"
-    @onpointerup="@HandlePointerUp"
-    @onpointerleave="@HandlePointerUp">
+﻿<div class="graph-pane @Class" style="@Style"
+    onmousewheel="event.preventDefault();"
+    ontouchmove="event.preventDefault();">
 
-    <div class="graph-pane-content" style="@ContentStyle">
+    <div @onmousewheel="@HandleMouseWheel"
+        @onpointerdown="@HandlePointerDown"
+        @onpointermove="@HandlePointerMove"
+        @onpointerup="@HandlePointerUp"
+        @onpointerleave="@HandlePointerUp">
 
-        <div class="cm-dots" style="@DotsStyle"></div>
+        <div class="graph-pane-content" style="@ContentStyle">
 
-        <RenderBarrier @ref="@renderBarrier">
-            @ChildContent
-        </RenderBarrier>
+            <div class="cm-dots" style="@DotsStyle"></div>
+
+            <RenderBarrier @ref="@renderBarrier">
+                @ChildContent
+            </RenderBarrier>
+
+        </div>
 
     </div>
 
@@ -20,6 +25,12 @@
 @code {
     [Parameter]
     public RenderFragment ChildContent { get; set; }
+
+    [Parameter]
+    public string Class { get; set; } = "";
+
+    [Parameter]
+    public string Style { get; set; } = "";
 
     private RenderBarrier? renderBarrier;
 

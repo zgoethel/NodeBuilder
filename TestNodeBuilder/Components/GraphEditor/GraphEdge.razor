@@ -1,0 +1,56 @@
+﻿@{
+    var left = From.x < To.x ? From : To;
+    var right = From.x < To.x ? To : From;
+
+    var center = Center;
+    var size = Size;
+
+    var leftBoxY = right.y > left.y
+        ? size.h / 2
+        : 0;
+    var rightBoxY = right.y > left.y
+        ? 0
+        : size.h / 2;
+
+    var leftBoxStyle = right.y > left.y
+        ? "border-bottom-right-radius: 200px;border-bottom: 2px solid white;"
+        : "border-top-right-radius: 200px;border-top: 2px solid white;";
+
+    var rightBoxStyle = right.y > left.y
+        ? "border-top-left-radius: 200px;border-top: 2px solid white;"
+        : "border-bottom-left-radius: 200px;border-bottom: 2px solid white;";
+}
+
+<div style="position: absolute;
+            left: @(left.x)px;
+            top: @(leftBoxY)px;
+            width: @(size.w / 2 + 1)px;
+            height: @(size.h / 2)px;
+            border-right: 2px solid white;
+            @leftBoxStyle">
+</div>
+
+<div style="position: absolute;
+            left: @(left.x + size.w / 2 - 1)px;
+            top: @(rightBoxY)px;
+            width: @(size.w / 2 + 1)px;
+            height: @(size.h / 2)px;
+            border-left: 2px solid white;
+            @rightBoxStyle">
+</div>
+
+@code {
+    [Parameter]
+    public (double x, double y) From { get; set; }
+
+    [Parameter]
+    public (double x, double y) To { get; set; }
+
+    private (double x, double y) Center => (
+        (From.x + To.x) / 2,
+        (From.y + To.y) / 2);
+
+    private (double w, double h) Size => (
+        Math.Abs(To.x - From.x),
+        Math.Abs(To.y - From.y));
+}

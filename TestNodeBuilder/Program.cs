@@ -2,6 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Resources;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using TestNodeBuilder.Components.GraphEditor;
 using TestNodeBuilder.Lexer;
 using TestNodeBuilder.Parser;
 
@@ -149,6 +150,8 @@ internal static class Program
         services.AddWindowsFormsBlazorWebView();
         services.AddTransient<HomeForm>();
         services.AddTransient<EditTokenForm>();
+
+        services.AddTransient<GraphEdgeContext>();
 
         var sp = services.BuildServiceProvider();
 

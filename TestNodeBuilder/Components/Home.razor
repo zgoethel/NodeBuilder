@@ -1,10 +1,22 @@
 @inject IServiceProvider sp
+@inject GraphEdgeContext edgeContext
+
+<CascadingValue Value="@edgeContext">
 
 <div class="p-3" style="position: relative;height: 100vh;">
 
     <GraphPane Style="position: absolute;left: 0;top: 0;width: 100%;height: 100%;" @ref="@graphPane">
 
-        <DragContainer>
+        <RenderBarrier @ref="@edgeBarrier">
+            
+            @foreach (var edge in edgeContext.PlottedEdges)
+            {
+                <GraphEdge @key="@edge" From="@edge.From" To="@edge.To" />
+            }
+
+        </RenderBarrier>
+
+        <DragContainer PositionChanged="@edgeContext.RebuildPlottedEdges" Class="node-a">
             <GraphNode Class="pe-0 bg-dark text-light" HeightCm="1" RightOutput>
 
                 <h5 class="m-0 fw-bolder fst-italic">
@@ -18,7 +30,7 @@
             </GraphNode>
         </DragContainer>
 
-        <DragContainer InitialPosition="(0, 50)">
+        <DragContainer InitialPosition="(0, 50)" PositionChanged="@edgeContext.RebuildPlottedEdges" Class="node-b">
             <GraphNode HeightCm="1" LeftInput RightOutput>
 
                 <h5 class="m-0">Token</h5>
@@ -26,19 +38,38 @@
             </GraphNode>
         </DragContainer>
 
-        <GraphEdge From="(100, 100)" To="(200, 200)" />
-
-        <GraphEdge From="(400, 100)" To="(300, 200)" />
-
     </GraphPane>
 
 </div>
+
+</CascadingValue>
 
 @code {
     [Parameter]
     public HomeForm? Form { get; set; }
 
     private GraphPane? graphPane;
+    private RenderBarrier? edgeBarrier;
+
+    private async Task RedrawEdges()
+    {
+        if (edgeBarrier is not null)
+        {
+            await edgeBarrier.Redraw();
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        edgeContext.DomEdges.Add(new()
+        {
+            SelectorFrom = ".node-a .right-anchor",
+            SelectorTo = ".node-b .left-anchor"
+        });
+        edgeContext.EdgesChanged += RedrawEdges;
+    }
 
     protected override void OnAfterRender(bool firstRender)
     {

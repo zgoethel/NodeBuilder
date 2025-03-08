@@ -1,4 +1,7 @@
-﻿<CascadingValue Name="EffectiveScale" TValue="double?" Value="@EffectiveScale">
+﻿@inject GraphEdgeContext edgeContext
+
+<CascadingValue Value="@edgeContext">
+<CascadingValue Name="EffectiveScale" TValue="double?" Value="@EffectiveScale">
 
 <div class="graph-pane @Class" style="@Style"
     onmousewheel="event.preventDefault();"
@@ -14,6 +17,8 @@
 
             <div class="cm-dots" style="@DotsStyle"></div>
 
+            <GraphEdgeOutlet />
+
             <RenderBarrier @ref="@renderBarrier">
                 @ChildContent
             </RenderBarrier>
@@ -25,6 +30,7 @@
 </div>
 
 </CascadingValue>
+</CascadingValue>
 
 @code {
     [Parameter]
@@ -35,6 +41,8 @@
 
     [Parameter]
     public string Style { get; set; } = "";
+
+    public GraphEdgeContext EdgeContext => edgeContext;
 
     private RenderBarrier? renderBarrier;
 
@@ -58,14 +66,20 @@
         $"  calc(0.25cm + {offsetX:0.000}px) calc(0.25cm + {offsetY:0.000}px);");
 
     private bool shouldRender = true;
+    private bool shouldRebuild = true;
 
     protected override bool ShouldRender() => shouldRender;
 
-    protected override void OnAfterRender(bool firstRender)
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         shouldRender = false;
-        base.OnAfterRender(firstRender);
+        await base.OnAfterRenderAsync(firstRender);
 
+        if (shouldRebuild)
+        {
+            shouldRebuild = false;
+            await edgeContext.RebuildPlottedEdges(EffectiveScale);
+        }
     }
 
     private void HandleMouseWheel(WheelEventArgs ev)
@@ -103,5 +117,13 @@
         {
             await renderBarrier.Redraw();
         }
+    }
+
+    public async Task RebuildPlottedEdges()
+    {
+        shouldRebuild = true;
+
+        renderBarrier.MarkDirty();
+        await InvokeAsync(StateHasChanged);
     }
 }

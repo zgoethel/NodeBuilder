@@ -23,6 +23,9 @@
 </div>
 
 @code {
+    [CascadingParameter]
+    public GraphEdgeContext? EdgeContext { get; set; }
+
     [CascadingParameter(Name = "EffectiveScale")]
     public double? EffectiveScale { get; set; }
 
@@ -71,14 +74,21 @@
     }
 
     private bool shouldRender = true;
+    private bool shouldRebuildEdges = false;
 
     protected override bool ShouldRender() => shouldRender;
 
-    protected override void OnAfterRender(bool firstRender)
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         shouldRender = false;
-        base.OnAfterRender(firstRender);
+        await base.OnAfterRenderAsync(firstRender);
 
+        if (EdgeContext is not null && shouldRebuildEdges)
+        {
+            shouldRebuildEdges = false;
+
+            await EdgeContext.RebuildPlottedEdges(EffectiveScale ?? 1.0);
+        }
     }
 
     private void HandlePointerDown()
@@ -96,6 +106,7 @@
                 Position.y + ev.MovementY / (EffectiveScale ?? 1)));
 
             shouldRender = true;
+            shouldRebuildEdges = true;
         }
     }
 

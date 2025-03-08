@@ -20,6 +20,8 @@ public class GraphEdgeContext(IJSRuntime js) : IDisposable
         public DomEdge CreatedFrom { get; } = createdFrom;
     }
 
+    public string OriginSelector { get; set; } = ".graph-origin";
+
     public List<DomEdge> DomEdges { get; } = [];
 
     public List<PlottedEdge> PlottedEdges { get; private set; } = [];
@@ -70,10 +72,10 @@ public class GraphEdgeContext(IJSRuntime js) : IDisposable
 
             foreach (var edge in DomEdges)
             {
-                var _from = await domUtil.InvokeAsync<string>("getCenterCoords", edge.SelectorFrom, ".graph-pane .origin");
+                var _from = await domUtil.InvokeAsync<string>("getCenterCoords", edge.SelectorFrom, OriginSelector);
                 var from = _from.Split(",").Select(double.Parse).ToArray();
 
-                var _to = await domUtil.InvokeAsync<string>("getCenterCoords", edge.SelectorTo, ".graph-pane .origin");
+                var _to = await domUtil.InvokeAsync<string>("getCenterCoords", edge.SelectorTo, OriginSelector);
                 var to = _to.Split(",").Select(double.Parse).ToArray();
 
                 newEdges.Add(new(edge)

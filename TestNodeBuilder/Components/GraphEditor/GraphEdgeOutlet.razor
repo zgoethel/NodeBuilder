@@ -1,5 +1,12 @@
 ﻿@implements IDisposable
 
+@code {
+    private static int InstanceCount = 0;
+    private long Serial { get; } = ++InstanceCount;
+}
+
+<div id="@OriginId" class="graph-origin"></div>
+
 <RenderBarrier @ref="@renderBarrier">
 
     @foreach (var edge in Context?.PlottedEdges ?? [])
@@ -15,6 +22,7 @@
 
     private RenderBarrier? renderBarrier;
     private bool subscribed;
+    private string OriginId => $"graph-origin-{Serial}";
 
     public async Task Redraw()
     {
@@ -30,6 +38,7 @@
 
         if (Context is not null)
         {
+            Context.OriginSelector = $"#{OriginId}";
             Context.EdgesChanged += Redraw;
             subscribed = true;
         }

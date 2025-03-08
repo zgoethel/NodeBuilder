@@ -9,7 +9,7 @@
 
         <GraphEdgeOutlet @ref="@edgeOutlet" />
 
-        <DragContainer PositionChanged="@edgeContext.RebuildPlottedEdges" Class="node-a">
+        <DragContainer PositionChanged="@RebuildPlottedEdges" Class="node-a">
             <GraphNode Class="pe-0 bg-dark text-light" HeightCm="1" RightOutput>
 
                 <h5 class="m-0 fw-bolder fst-italic">
@@ -23,7 +23,7 @@
             </GraphNode>
         </DragContainer>
 
-        <DragContainer InitialPosition="(0, 50)" PositionChanged="@edgeContext.RebuildPlottedEdges" Class="node-b">
+        <DragContainer InitialPosition="(0, 50)" PositionChanged="@RebuildPlottedEdges" Class="node-b">
             <GraphNode HeightCm="1" LeftInput RightOutput>
 
                 <h5 class="m-0">Token</h5>
@@ -79,5 +79,11 @@
     {
         var nextForm = sp.GetRequiredService<EditTokenForm>();
         var token = await nextForm.ShowEditTokenForm(regex, (_) => "Invalid");
+    }
+
+    private async Task RebuildPlottedEdges()
+    {
+        await Task.Delay(10);
+        await edgeContext.RebuildPlottedEdges(graphPane?.EffectiveScale ?? 1.0);
     }
 }

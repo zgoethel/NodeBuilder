@@ -36,7 +36,7 @@ public class GraphEdgeContext(IJSRuntime js)
         }
     }
 
-    public async Task RebuildPlottedEdges()
+    public async Task RebuildPlottedEdges(double scale = 1.0)
     {
         domUtil ??= await js.InvokeAsync<IJSObjectReference>("import", "./js/DomUtil.js");
 
@@ -52,8 +52,8 @@ public class GraphEdgeContext(IJSRuntime js)
 
             newEdges.Add(new(edge)
             {
-                To = (to[0], to[1]),
-                From = (from[0], from[1])
+                To = (to[0] / scale, to[1] / scale),
+                From = (from[0] / scale, from[1] / scale)
             });
         }
 

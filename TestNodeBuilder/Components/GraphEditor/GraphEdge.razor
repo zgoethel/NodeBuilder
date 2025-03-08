@@ -1,4 +1,7 @@
 ﻿@{
+    //TODO Convert to SVG
+}
+@{
     var left = From.x < To.x ? From : To;
     var right = From.x < To.x ? To : From;
 
@@ -6,19 +9,19 @@
     var size = Size;
 
     var leftBoxY = right.y > left.y
-        ? size.h / 2
-        : 0;
+        ? left.y
+        : center.y;
     var rightBoxY = right.y > left.y
-        ? 0
-        : size.h / 2;
+        ? center.y
+        : right.y;
 
     var leftBoxStyle = right.y > left.y
-        ? "border-bottom-right-radius: 200px;border-bottom: 2px solid white;"
-        : "border-top-right-radius: 200px;border-top: 2px solid white;";
+        ? "border-top-right-radius: 200px;border-top: 2px solid white;"
+        : "border-bottom-right-radius: 200px;border-bottom: 2px solid white;";
 
     var rightBoxStyle = right.y > left.y
-        ? "border-top-left-radius: 200px;border-top: 2px solid white;"
-        : "border-bottom-left-radius: 200px;border-bottom: 2px solid white;";
+        ? "border-bottom-left-radius: 200px;border-bottom: 2px solid white;"
+        : "border-top-left-radius: 200px;border-top: 2px solid white;";
 }
 
 <div style="position: absolute;
@@ -31,7 +34,7 @@
 </div>
 
 <div style="position: absolute;
-            left: @(left.x + size.w / 2 - 1)px;
+            left: @(center.x - 1)px;
             top: @(rightBoxY)px;
             width: @(size.w / 2 + 1)px;
             height: @(size.h / 2)px;

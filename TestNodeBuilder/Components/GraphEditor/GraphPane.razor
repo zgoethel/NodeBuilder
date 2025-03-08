@@ -43,7 +43,7 @@
     private const double MIN_SCALE = 0.5, MAX_SCALE = 1.5;
     private double scale;
 
-    private double EffectiveScale => MIN_SCALE + (scale + 1) / 2 * (MAX_SCALE - MIN_SCALE);
+    public double EffectiveScale => MIN_SCALE + (scale + 1) / 2 * (MAX_SCALE - MIN_SCALE);
 
     private double offsetX = 10, offsetY = 10;
     private bool dragging;

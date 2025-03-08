@@ -1,0 +1,45 @@
+﻿@implements IDisposable
+
+<RenderBarrier @ref="@renderBarrier">
+
+    @foreach (var edge in Context?.PlottedEdges ?? [])
+    {
+        <GraphEdge @key="@edge" From="@edge.From" To="@edge.To" />
+    }
+
+</RenderBarrier>
+
+@code {
+    [CascadingParameter]
+    public GraphEdgeContext? Context { get; set; }
+
+    private RenderBarrier? renderBarrier;
+    private bool subscribed;
+
+    public async Task Redraw()
+    {
+        if (renderBarrier is not null)
+        {
+            await renderBarrier.Redraw();
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        if (Context is not null)
+        {
+            Context.EdgesChanged += Redraw;
+            subscribed = true;
+        }
+    }
+
+    void IDisposable.Dispose()
+    {
+        if (subscribed)
+        {
+            Context.EdgesChanged -= Redraw;
+        }
+    }
+}

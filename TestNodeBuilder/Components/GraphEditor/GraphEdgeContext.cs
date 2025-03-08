@@ -44,10 +44,10 @@ public class GraphEdgeContext(IJSRuntime js)
 
         foreach (var edge in DomEdges)
         {
-            var _from = await domUtil.InvokeAsync<string>("getCenterCoords", edge.SelectorFrom);
+            var _from = await domUtil.InvokeAsync<string>("getCenterCoords", edge.SelectorFrom, ".graph-pane .origin");
             var from = _from.Split(",").Select(double.Parse).ToArray();
 
-            var _to = await domUtil.InvokeAsync<string>("getCenterCoords", edge.SelectorTo);
+            var _to = await domUtil.InvokeAsync<string>("getCenterCoords", edge.SelectorTo, ".graph-pane .origin");
             var to = _to.Split(",").Select(double.Parse).ToArray();
 
             newEdges.Add(new(edge)

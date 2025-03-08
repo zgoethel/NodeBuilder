@@ -73,9 +73,17 @@ public class GraphEdgeContext(IJSRuntime js) : IDisposable
             foreach (var edge in DomEdges)
             {
                 var _from = await domUtil.InvokeAsync<string>("getCenterCoords", edge.SelectorFrom, OriginSelector);
+                if (string.IsNullOrEmpty(_from))
+                {
+                    continue;
+                }
                 var from = _from.Split(",").Select(double.Parse).ToArray();
 
                 var _to = await domUtil.InvokeAsync<string>("getCenterCoords", edge.SelectorTo, OriginSelector);
+                if (string.IsNullOrEmpty(_to))
+                {
+                    continue;
+                }
                 var to = _to.Split(",").Select(double.Parse).ToArray();
 
                 newEdges.Add(new(edge)

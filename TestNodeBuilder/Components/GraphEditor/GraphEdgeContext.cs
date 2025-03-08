@@ -91,6 +91,8 @@ public class GraphEdgeContext(IJSRuntime js) : IDisposable
 
     void IDisposable.Dispose()
     {
+        GC.SuppressFinalize(this);
+
         mutexLock.Dispose();
         queueLock.Dispose();
     }

@@ -7,9 +7,9 @@
 
     <GraphPane Style="position: absolute;left: 0;top: 0;width: 100%;height: 100%;" @ref="@graphPane">
 
-        <GraphEdgeOutlet @ref="@edgeOutlet" />
+        <GraphEdgeOutlet />
 
-        <DragContainer PositionChanged="@RebuildPlottedEdges" Class="node-a">
+        <DragContainer PositionChanged="@RebuildPlottedEdges" Class="start-node">
             <GraphNode Class="pe-0 bg-dark text-light" HeightCm="1" RightOutput>
 
                 <h5 class="m-0 fw-bolder fst-italic">
@@ -23,13 +23,16 @@
             </GraphNode>
         </DragContainer>
 
-        <DragContainer InitialPosition="(0, 50)" PositionChanged="@RebuildPlottedEdges" Class="node-b">
-            <GraphNode HeightCm="1" LeftInput RightOutput>
+        @for (var i = 0; i < 8; i++)
+        {
+            <DragContainer InitialPosition="(0, 50)" PositionChanged="@RebuildPlottedEdges" Class="@($"node-{i}")">
+                <GraphNode HeightCm="1" LeftInput RightOutput>
 
-                <h5 class="m-0">Token</h5>
+                    <h5 class="m-0">Token</h5>
 
-            </GraphNode>
-        </DragContainer>
+                </GraphNode>
+            </DragContainer>
+        }
 
     </GraphPane>
 
@@ -42,18 +45,25 @@
     public HomeForm? Form { get; set; }
 
     private GraphPane? graphPane;
-    private GraphEdgeOutlet? edgeOutlet;
     private bool shouldRebuild = true;
 
     protected override void OnInitialized()
     {
         base.OnInitialized();
 
-        edgeContext.DomEdges.Add(new()
+        for (var i = 0; i < 4; i++)
         {
-            SelectorFrom = ".node-a .right-anchor",
-            SelectorTo = ".node-b .left-anchor"
-        });
+            edgeContext.DomEdges.Add(new()
+            {
+                SelectorFrom = ".start-node .right-anchor",
+                SelectorTo = $".node-{i} .left-anchor"
+            });
+            edgeContext.DomEdges.Add(new()
+            {
+                SelectorFrom = $".node-{i} .right-anchor",
+                SelectorTo = $".node-{i + 4} .left-anchor"
+            });
+        }
     }
 
     protected override void OnAfterRender(bool firstRender)
@@ -83,7 +93,7 @@
         var token = await nextForm.ShowEditTokenForm(regex, (_) => "Invalid");
     }
 
-    private async Task RebuildPlottedEdges()
+    private void RebuildPlottedEdges()
     {
         shouldRebuild = true;
     }

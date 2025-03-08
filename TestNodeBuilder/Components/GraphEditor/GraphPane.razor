@@ -65,9 +65,9 @@
 
     protected override void OnAfterRender(bool firstRender)
     {
+        shouldRender = false;
         base.OnAfterRender(firstRender);
 
-        shouldRender = false;
     }
 
     private void HandleMouseWheel(WheelEventArgs ev)

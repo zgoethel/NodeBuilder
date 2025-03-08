@@ -2,7 +2,7 @@
 
 namespace TestNodeBuilder.Components.GraphEditor;
 
-public class GraphEdgeContext(IJSRuntime js)
+public class GraphEdgeContext(IJSRuntime js) : IDisposable
 {
     public class DomEdge
     {
@@ -27,6 +27,8 @@ public class GraphEdgeContext(IJSRuntime js)
     public event Func<Task>? EdgesChanged;
 
     private IJSObjectReference? domUtil;
+    private readonly SemaphoreSlim mutexLock = new(1, 1);
+    private readonly SemaphoreSlim queueLock = new(1, 1);
 
     public async Task InvokeEdgesChanged()
     {
@@ -36,29 +38,60 @@ public class GraphEdgeContext(IJSRuntime js)
         }
     }
 
+    private async Task _Throttle(Func<Task> work)
+    {
+        if (!await queueLock.WaitAsync(0))
+        {
+            return;
+        }
+        try
+        {
+            await mutexLock.WaitAsync();
+        } finally
+        {
+            queueLock.Release();
+        }
+        try
+        {
+            await work();
+        } finally
+        {
+            mutexLock.Release();
+        }
+    }
+
     public async Task RebuildPlottedEdges(double scale = 1.0)
     {
-        domUtil ??= await js.InvokeAsync<IJSObjectReference>("import", "./js/DomUtil.js");
-
-        var newEdges = new List<PlottedEdge>();
-
-        foreach (var edge in DomEdges)
+        await _Throttle(async () =>
         {
-            var _from = await domUtil.InvokeAsync<string>("getCenterCoords", edge.SelectorFrom, ".graph-pane .origin");
-            var from = _from.Split(",").Select(double.Parse).ToArray();
+            domUtil ??= await js.InvokeAsync<IJSObjectReference>("import", "./js/DomUtil.js");
 
-            var _to = await domUtil.InvokeAsync<string>("getCenterCoords", edge.SelectorTo, ".graph-pane .origin");
-            var to = _to.Split(",").Select(double.Parse).ToArray();
+            var newEdges = new List<PlottedEdge>();
 
-            newEdges.Add(new(edge)
+            foreach (var edge in DomEdges)
             {
-                To = (to[0] / scale, to[1] / scale),
-                From = (from[0] / scale, from[1] / scale)
-            });
-        }
+                var _from = await domUtil.InvokeAsync<string>("getCenterCoords", edge.SelectorFrom, ".graph-pane .origin");
+                var from = _from.Split(",").Select(double.Parse).ToArray();
 
-        PlottedEdges = newEdges;
+                var _to = await domUtil.InvokeAsync<string>("getCenterCoords", edge.SelectorTo, ".graph-pane .origin");
+                var to = _to.Split(",").Select(double.Parse).ToArray();
 
-        await InvokeEdgesChanged();
+                newEdges.Add(new(edge)
+                {
+                    To = (to[0] / scale, to[1] / scale),
+                    From = (from[0] / scale, from[1] / scale)
+                });
+            }
+
+            PlottedEdges = newEdges;
+
+            await InvokeEdgesChanged();
+        });
+    }
+
+    void IDisposable.Dispose()
+    {
+        mutexLock.Dispose();
+        queueLock.Dispose();
     }
 }

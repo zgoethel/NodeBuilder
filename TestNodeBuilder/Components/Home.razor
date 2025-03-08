@@ -43,6 +43,7 @@
 
     private GraphPane? graphPane;
     private GraphEdgeOutlet? edgeOutlet;
+    private bool shouldRebuild = true;
 
     protected override void OnInitialized()
     {
@@ -69,9 +70,10 @@
     {
         await base.OnAfterRenderAsync(firstRender);
 
-        if (firstRender)
+        if (shouldRebuild)
         {
-            await edgeContext.RebuildPlottedEdges();
+            shouldRebuild = false;
+            await edgeContext.RebuildPlottedEdges(graphPane?.EffectiveScale ?? 1.0);
         }
     }
 
@@ -83,7 +85,6 @@
 
     private async Task RebuildPlottedEdges()
     {
-        await Task.Delay(10);
-        await edgeContext.RebuildPlottedEdges(graphPane?.EffectiveScale ?? 1.0);
+        shouldRebuild = true;
     }
 }

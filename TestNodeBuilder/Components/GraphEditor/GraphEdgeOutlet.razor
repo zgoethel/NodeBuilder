@@ -11,7 +11,12 @@
 
     @foreach (var edge in Context?.PlottedEdges ?? [])
     {
-        <GraphEdge @key="@edge" From="@edge.From" To="@edge.To" />
+        <GraphEdge @key="@edge"
+            From="@edge.From"
+            To="@edge.To"
+            Width="@(edge.CreatedFrom.Width ?? GraphEdge.DEFAULT_WIDTH)"
+            Color="@(edge.CreatedFrom.Color ?? GraphEdge.DEFAULT_COLOR)"
+            Dashed="@(edge.CreatedFrom.Dashed ?? GraphEdge.DEFAULT_DASHED)" />
     }
 
 </RenderBarrier>

@@ -1,59 +1,60 @@
 ﻿@{
-    //TODO Convert to SVG
-}
-@{
-    var left = From.x < To.x ? From : To;
-    var right = From.x < To.x ? To : From;
-
-    var center = Center;
     var size = Size;
 
-    var leftBoxY = right.y > left.y
-        ? left.y
-        : center.y;
-    var rightBoxY = right.y > left.y
-        ? center.y
-        : right.y;
+    var left = Left;
+    var right = Right;
 
-    var leftBoxStyle = right.y > left.y
-        ? "border-top-right-radius: 50px;border-top: 2px solid white;"
-        : "border-bottom-right-radius: 50px;border-bottom: 2px solid white;";
+    var yBase = Math.Min(left.y, right.y);
+    var yDiff = right.y - left.y;
 
-    var rightBoxStyle = right.y > left.y
-        ? "border-bottom-left-radius: 50px;border-bottom: 2px solid white;"
-        : "border-top-left-radius: 50px;border-top: 2px solid white;";
+    double interpX(double amount) => Math.Round(size.w * amount, 2);
+    double interpY(double amount) => Math.Round(left.y - yBase + yDiff * amount, 2);
 }
 
 <div style="position: absolute;
-            left: @(left.x)px;
-            top: @(leftBoxY)px;
-            width: @(size.w / 2 + 1)px;
-            height: @(size.h / 2)px;
-            border-right: 2px solid white;
-            @leftBoxStyle">
-</div>
+    left: @(Math.Round(left.x, 2) - 20)px;
+    top: @(Math.Round(yBase, 2) - 20)px;">
 
-<div style="position: absolute;
-            left: @(center.x - 1)px;
-            top: @(rightBoxY)px;
-            width: @(size.w / 2 + 1)px;
-            height: @(size.h / 2)px;
-            border-left: 2px solid white;
-            @rightBoxStyle">
+    <svg width="@(size.w + 40)" height="@(size.h + 40)" xmlns="http://www.w3.org/2000/svg">
+
+        <path stroke-width="@Width"
+            stroke-dasharray="@(Dashed ? "10 5" : "")"
+            stroke="@Color"
+            fill="transparent"
+            d="M @(interpX(0.0) + 20) @(interpY(0.0) + 20)
+               C @(interpX(1.0) + 20) @(interpY(0.05) + 20),
+                 @(interpX(0.0) + 20) @(interpY(0.95) + 20),
+                 @(interpX(1.0) + 20) @(interpY(1.0) + 20)" />
+
+    </svg>
+
 </div>
 
 @code {
+    public const decimal DEFAULT_WIDTH = 3.0m;
+    public const string DEFAULT_COLOR = "white";
+    public const bool DEFAULT_DASHED = false;
+
     [Parameter]
     public (double x, double y) From { get; set; }
 
     [Parameter]
     public (double x, double y) To { get; set; }
 
-    private (double x, double y) Center => (
-        (From.x + To.x) / 2,
-        (From.y + To.y) / 2);
+    [Parameter]
+    public decimal Width { get; set; } = DEFAULT_WIDTH;
+
+    [Parameter]
+    public string Color { get; set; } = DEFAULT_COLOR;
+
+    [Parameter]
+    public bool Dashed { get; set; } = DEFAULT_DASHED;
 
     private (double w, double h) Size => (
         Math.Abs(To.x - From.x),
         Math.Abs(To.y - From.y));
+
+    private (double x, double y) Left => From.x < To.x ? From : To;
+    
+    private (double x, double y) Right => From.x < To.x ? To : From;
 }

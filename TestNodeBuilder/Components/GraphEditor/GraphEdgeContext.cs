@@ -9,6 +9,12 @@ public class GraphEdgeContext(IJSRuntime js) : IDisposable
         public string SelectorFrom { get; set; } = "";
 
         public string SelectorTo { get; set; } = "";
+
+        public decimal? Width { get; set; }
+
+        public string? Color { get; set; }
+
+        public bool? Dashed { get; set; }
     }
 
     public class PlottedEdge(DomEdge createdFrom)

@@ -1,0 +1,28 @@
+﻿<div class="position-relative d-flex flex-column w-100 h-100 @Class" style="@Style">
+
+    <GraphEditorToolbar @ref="@toolbar" />
+
+    <GraphPane Class="flex-grow-1 flex-shrink-1" @ref="@pane">
+
+        @ChildContent
+
+    </GraphPane>
+
+</div>
+
+@code {
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    [Parameter]
+    public string Class { get; set; } = "";
+
+    [Parameter]
+    public string Style { get; set; } = "";
+
+    private GraphEditorToolbar? toolbar;
+    public GraphEditorToolbar Toolbar => toolbar ?? throw new Exception("Graph editor toolbar is not ready yet");
+
+    private GraphPane? pane;
+    public GraphPane Pane => pane ?? throw new Exception("Graph pane is not ready yet");
+}

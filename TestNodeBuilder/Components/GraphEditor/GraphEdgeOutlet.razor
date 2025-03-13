@@ -9,7 +9,7 @@
 
 <RenderBarrier @ref="@renderBarrier">
 
-    @foreach (var edge in Context?.PlottedEdges ?? [])
+    @foreach (var edge in EdgeContext?.PlottedEdges ?? [])
     {
         <GraphEdge @key="@edge"
             From="@edge.From"
@@ -23,7 +23,7 @@
 
 @code {
     [CascadingParameter]
-    public GraphEdgeContext? Context { get; set; }
+    public GraphEdgeContext? EdgeContext { get; set; }
 
     private RenderBarrier? renderBarrier;
     private bool subscribed;
@@ -41,19 +41,22 @@
     {
         base.OnInitialized();
 
-        if (Context is not null)
+        if (EdgeContext is not null)
         {
-            Context.OriginSelector = $"#{OriginId}";
-            Context.EdgesChanged += Redraw;
+            EdgeContext.OriginSelector = $"#{OriginId}";
+            EdgeContext.EdgesChanged += Redraw;
             subscribed = true;
         }
     }
 
-    void IDisposable.Dispose()
+    public void Dispose()
     {
+        GC.SuppressFinalize(this);
+
         if (subscribed)
         {
-            Context.EdgesChanged -= Redraw;
+            EdgeContext!.EdgesChanged -= Redraw;
+            subscribed = false;
         }
     }
 }

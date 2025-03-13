@@ -1,0 +1,157 @@
+﻿<div class="d-flex flex-row gap-2 px-3 py-1 bg-light align-items-center">
+
+    <div class="btn-group" role="group" style="white-space: nowrap;">
+
+        <button type="button"
+            class="btn btn-outline-dark d-flex flex-row gap-2 align-items-center"
+            @onclick="@OnTokensClicked">
+
+            @SD.Icons.BiRegex()
+            Tokens
+
+        </button>
+
+        <div class="btn-group" role="group">
+
+            <button type="button" class="btn btn-outline-dark dropdown-toggle" data-bs-toggle="dropdown">
+                Add
+            </button>
+
+            <ul class="dropdown-menu">
+                <li>
+
+                    <a class="dropdown-item d-flex flex-row gap-2 align-items-center"
+                        href="#"
+                        @onclick="@OnAddGrammarClicked">
+
+                        @SD.Icons.BiJournalCode()
+                        Grammar
+
+                    </a>
+
+                </li>
+                <li>
+
+                    <a class="dropdown-item d-flex flex-row gap-2 align-items-center"
+                        href="#"
+                        @onclick="@OnAddProductionClicked">
+
+                        @SD.Icons.BiDiagram3()
+                        Production
+
+                    </a>
+
+                </li>
+                <li>
+
+                    <a class="dropdown-item d-flex flex-row gap-2 align-items-center"
+                        href="#"
+                        @onclick="@OnAddNoteClicked">
+                        
+                        @SD.Icons.BiStickies()
+                        Note
+
+                    </a>
+
+                </li>
+            </ul>
+        </div>
+    </div>
+    
+    @*TODO*@
+    <div class="d-flex flex-row flex-grow-1 flex-shrink-1">
+
+        <select class="form-select border border-dark shadow" @bind="@activeProduction">
+            
+            <option>Top Level</option>
+
+            <option>Production A</option>
+            <option>Production B</option>
+            <option>Production C</option>
+
+        </select>
+
+        <button class="btn btn-outline-dark border-start-0"
+            title="Return to Top Level"
+            disabled="@(activeProduction == "Top Level")"
+            @onclick="@(() => activeProduction = "Top Level")">
+
+            @SD.Icons.BiHouse()
+
+        </button>
+
+    </div>
+
+    <div class="ms-auto border border-dark h-100">
+    </div>
+
+    <div class="btn-group" role="group">
+
+        <button class="btn btn-primary"
+            title="Save Grammar"
+            @onclick="@OnSaveGrammarClicked">
+
+            @SD.Icons.BiFloppy()
+
+        </button>
+
+        <button class="btn btn-outline-primary"
+            title="Open Grammar"
+            @onclick="@OnOpenGrammarClicked">
+
+            @SD.Icons.BiFolder2Open()
+
+        </button>
+
+    </div>
+
+    <div class="btn-group" role="group">
+
+        <button class="btn btn-outline-dark"
+            title="Export C#"
+            @onclick="@OnExportCsClicked">
+
+            @SD.Icons.BiFiletypeCs()
+
+        </button>
+
+        <button class="btn btn-outline-dark"
+            title="Try it out"
+            @onclick="@OnTryItOutClicked">
+
+            @SD.Icons.BiTerminal()
+
+        </button>
+
+    </div>
+
+</div>
+
+@code {
+    //TODO
+    private string activeProduction = "Top Level";
+
+    [Parameter]
+    public EventCallback OnTokensClicked { get; set; }
+
+    [Parameter]
+    public EventCallback OnAddGrammarClicked { get; set; }
+
+    [Parameter]
+    public EventCallback OnAddProductionClicked { get; set; }
+
+    [Parameter]
+    public EventCallback OnAddNoteClicked { get; set; }
+
+    [Parameter]
+    public EventCallback OnSaveGrammarClicked { get; set; }
+
+    [Parameter]
+    public EventCallback OnOpenGrammarClicked { get; set; }
+
+    [Parameter]
+    public EventCallback OnExportCsClicked { get; set; }
+
+    [Parameter]
+    public EventCallback OnTryItOutClicked { get; set; }
+}

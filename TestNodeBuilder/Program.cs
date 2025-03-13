@@ -3,6 +3,7 @@ using System.Resources;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using TestNodeBuilder.Components.GraphEditor;
+using TestNodeBuilder.Forms;
 using TestNodeBuilder.Lexer;
 using TestNodeBuilder.Parser;
 

@@ -1,4 +1,6 @@
-﻿<div id="@Id" class="d-flex flex-row align-items-center">
+﻿@implements IDisposable
+
+<div id="@Id" class="d-flex flex-row align-items-center">
 
     <div class="left-anchor position-relative">
 
@@ -7,6 +9,12 @@
             <div class="left-input">
             </div>
         }
+
+        <div class="node-buttons">
+            <div @onpointerdown:stopPropagation>
+
+            </div>
+        </div>
 
     </div>
 
@@ -24,13 +32,29 @@
             </div>
         }
 
+        <div class="node-buttons">
+            <div @onpointerdown:stopPropagation>
+
+                @if (RightOutput && !RightOutputConnected)
+                {
+                    <span class="icon-button" @onclick="@AddOutputClicked">
+                        @SD.Icons.BiNodePlus(size: 20)
+                    </span>
+                }
+
+            </div>
+        </div>
+
     </div>
 
 </div>
 
 @code {
+    [CascadingParameter]
+    public GraphEdgeContext? EdgeContext { get; set; }
+
     [Parameter]
-    public RenderFragment ChildContent { get; set; }
+    public RenderFragment? ChildContent { get; set; }
 
     [Parameter]
     public decimal? HeightCm { get; set; }
@@ -42,15 +66,70 @@
     public bool RightOutput { get; set; }
 
     [Parameter]
-    public string Id { get; set; }
+    [EditorRequired]
+    public string Id { get; set; } = "";
 
     [Parameter]
-    public string Class { get; set; }
+    public string Class { get; set; } = "";
 
     [Parameter]
-    public string Style { get; set; }
+    public string Style { get; set; } = "";
+
+    [Parameter]
+    public EventCallback AddOutputClicked { get; set; }
 
     private string NodeStyle => string.Join("",
         HeightCm.HasValue ? $"height: {HeightCm:0.000}cm;" : "",
         Style);
+
+    public bool LeftInputConnected { get; private set; }
+    public bool RightOutputConnected { get; private set; }
+
+    //TODO
+    private bool _LeftInputConnected => EdgeContext is not null
+        && EdgeContext.PlottedEdges.Any((it) => it.CreatedFrom.SelectorTo == $"#{Id} .left-input");
+
+    //TODO
+    private bool _RightOutputConnected => EdgeContext is not null
+        && EdgeContext.PlottedEdges.Any((it) => it.CreatedFrom.SelectorFrom == $"#{Id} .right-output");
+
+    private bool subscribed;
+
+    private async Task EvaluateConnectedState()
+    {
+        var oldL = LeftInputConnected;
+        var oldR = RightOutputConnected;
+
+        LeftInputConnected = _LeftInputConnected;
+        RightOutputConnected = _RightOutputConnected;
+
+        if (oldL != LeftInputConnected || oldR != RightOutputConnected)
+        {
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        if (EdgeContext is not null)
+        {
+            EdgeContext.EdgesChanged += EvaluateConnectedState;
+            subscribed = true;
+
+            await EvaluateConnectedState();
+        }
+    }
+
+    public void Dispose()
+    {
+        GC.SuppressFinalize(this);
+
+        if (subscribed)
+        {
+            EdgeContext!.EdgesChanged -= EvaluateConnectedState;
+            subscribed = false;
+        }
+    }
 }

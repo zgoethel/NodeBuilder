@@ -1,4 +1,4 @@
-﻿namespace TestNodeBuilder;
+﻿namespace TestNodeBuilder.Utilities;
 
 public static class Extensions
 {

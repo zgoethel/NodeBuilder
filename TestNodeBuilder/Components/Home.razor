@@ -1,76 +1,44 @@
 @inject IServiceProvider sp
 
-<div class="d-flex flex-column" style="position: relative;height: 100vh;">
+<GraphEditorImpl Style="height: 100vh !important;" @ref="@graphEditor">
 
-    <div class="d-flex flex-row gap-2 px-3 py-1 bg-light align-items-center">
+    <DragContainer>
+        <GraphNode Id="start-node" Class="pe-0 bg-dark text-light" Style="white-space: nowrap;" HeightCm="1" RightOutput>
 
-        <div class="btn-group" role="group">
-            <button type="button" class="btn btn-outline-dark">Tokens</button>
-            <button type="button" class="btn btn-outline-dark">Add</button>
-            <div class="btn-group" role="group">
-                <button id="btnGroupDrop1" type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    Dropdown
-                </button>
-                <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
-                    <a class="dropdown-item" href="#">Dropdown link</a>
-                    <a class="dropdown-item" href="#">Dropdown link</a>
-                </div>
-            </div>
-        </div>
+            <h5 class="m-0 fw-bolder fst-italic">
+                Start
+            </h5>
+            @SD.Icons.BiArrowRightShort(size: 40.0m)
 
-        <select class="form-select border border-dark shadow">
-            <option>Production A</option>
-            <option>Production B</option>
-            <option>Production C</option>
-        </select>
+        </GraphNode>
+    </DragContainer>
 
-        <div class="ms-auto border border-dark h-100">
-        </div>
+    @for (var _i = 0; _i < numNodes; _i++)
+    {
+        var i = _i;
 
-        <button class="btn btn-primary">Save</button>
+        <DragContainer InitialPosition="(i * 110 + 130, i * 110 + 130)">
+            <GraphNode Id="@($"node-{i}")"
+                Style="white-space: nowrap;"
+                HeightCm="1"
+                LeftInput
+                RightOutput
+                AddOutputClicked="@(async () => await AddNode(i))">
 
-        <button class="btn btn-outline-dark">Export</button>
-
-    </div>
-
-    <GraphPane Class="flex-grow-1 flex-shrink-1" @ref="@graphPane">
-
-        <DragContainer>
-            <GraphNode Id="start-node" Class="pe-0 bg-dark text-light" Style="white-space: nowrap;" HeightCm="1" RightOutput>
-
-                <h5 class="m-0 fw-bolder fst-italic">
-                    Start
-                </h5>
-
-                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="currentColor" class="bi bi-arrow-right-short" viewBox="0 0 16 16">
-                    <path fill-rule="evenodd" d="M4 8a.5.5 0 0 1 .5-.5h5.793L8.146 5.354a.5.5 0 1 1 .708-.708l3 3a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708-.708L10.293 8.5H4.5A.5.5 0 0 1 4 8" />
-                </svg>
+                <h5 class="m-0">Node @i</h5>
 
             </GraphNode>
         </DragContainer>
+    }
 
-        @for (var _i = 0; _i < 2; _i++)
-        {
-            var i = _i;
-
-            <DragContainer InitialPosition="(i * 110 + 130, i * 110 + 130)">
-                <GraphNode Id="@($"node-{i}")" Style="white-space: nowrap;" HeightCm="1" LeftInput RightOutput>
-
-                    <h5 class="m-0">Node @i</h5>
-
-                </GraphNode>
-            </DragContainer>
-        }
-
-    </GraphPane>
-
-</div>
+</GraphEditorImpl>
 
 @code {
     [Parameter]
     public HomeForm? Form { get; set; }
 
-    private GraphPane? graphPane;
+    private GraphEditorImpl? graphEditor;
+    private int numNodes = 2;
 
     protected override void OnAfterRender(bool firstRender)
     {
@@ -89,21 +57,33 @@
         if (firstRender)
         {
             //TODO Add edges from saved graph
-            graphPane.EdgeContext.DomEdges.Add(new()
+            graphEditor!.Pane.EdgeContext.DomEdges.Add(new()
             {
                 SelectorFrom = "#start-node .right-output",
                 SelectorTo = "#node-0 .left-input",
                 Color = "red"
             });
-            graphPane.EdgeContext.DomEdges.Add(new()
+            graphEditor!.Pane.EdgeContext.DomEdges.Add(new()
             {
                 SelectorFrom = "#node-0 .right-output",
                 SelectorTo = "#node-1 .left-input",
                 Dashed = true
             });
 
-            await graphPane.RebuildPlottedEdges();
+            await graphEditor.Pane.RebuildPlottedEdges();
         }
+    }
+
+    //TODO
+    private async Task AddNode(int currNode)
+    {
+        graphEditor!.Pane.EdgeContext.DomEdges.Add(new()
+        {
+            SelectorFrom = $"#node-{currNode} .right-output",
+            SelectorTo = $"#node-{numNodes++} .left-input"
+        });
+
+        await graphEditor.Pane.RebuildPlottedEdges();
     }
 
     //TODO

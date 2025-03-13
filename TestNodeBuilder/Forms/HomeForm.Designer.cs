@@ -1,4 +1,4 @@
-﻿namespace TestNodeBuilder
+﻿namespace TestNodeBuilder.Forms
 {
     partial class HomeForm
     {

@@ -105,7 +105,7 @@ public class GraphEdgeContext(IJSRuntime js) : IDisposable
         });
     }
 
-    void IDisposable.Dispose()
+    public void Dispose()
     {
         GC.SuppressFinalize(this);
 

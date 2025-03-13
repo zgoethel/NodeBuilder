@@ -1,13 +1,21 @@
 using Microsoft.AspNetCore.Components.WebView.WindowsForms;
 using TestNodeBuilder.Components;
+using TestNodeBuilder.Utilities;
 
-namespace TestNodeBuilder;
+namespace TestNodeBuilder.Forms;
 
 public partial class HomeForm : Form
 {
+    private readonly Throttle formMovedThrottle = new();
+
     public HomeForm(IServiceProvider sp)
     {
         InitializeComponent();
+
+        Disposed += (_, __) =>
+        {
+            formMovedThrottle.Dispose();
+        };
 
         blazorWebView1.HostPage = "wwwroot/index.html";
         blazorWebView1.Services = sp;
@@ -28,8 +36,16 @@ public partial class HomeForm : Form
 
     private void HomeForm_Move(object sender, EventArgs e)
     {
-        // Resize to fix issue where select items don't move with window
-        Width += 1;
-        Width -= 1;
+        _ = formMovedThrottle.PerformThrottled(() =>
+        {
+            Invoke(() =>
+            {
+                // Resize to fix issue where select items don't move with window
+                Width += 1;
+                Width -= 1;
+            });
+
+            return Task.CompletedTask;
+        }, millis: 200);
     }
 }

@@ -1,6 +1,7 @@
 ﻿using TestNodeBuilder.Lexer;
+using TestNodeBuilder.Utilities;
 
-namespace TestNodeBuilder;
+namespace TestNodeBuilder.Forms;
 
 public partial class EditTokenForm : Form
 {

@@ -34,7 +34,7 @@
 
 @code {
     [Parameter]
-    public RenderFragment ChildContent { get; set; }
+    public RenderFragment? ChildContent { get; set; }
 
     [Parameter]
     public string Class { get; set; } = "";
@@ -121,9 +121,10 @@
 
     public async Task RebuildPlottedEdges()
     {
+        shouldRender = true;
         shouldRebuild = true;
 
-        renderBarrier.MarkDirty();
+        renderBarrier?.MarkDirty();
         await InvokeAsync(StateHasChanged);
     }
 }

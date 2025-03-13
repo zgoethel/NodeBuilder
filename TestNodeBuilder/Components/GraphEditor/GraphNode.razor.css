@@ -13,6 +13,30 @@
     position: relative;
 }
 
+    .left-anchor .node-buttons {
+        right: 0.25cm;
+    }
+
+    .right-anchor .node-buttons {
+        left: 0.25cm;
+    }
+
+.node-buttons {
+    position: absolute;
+    top: -50%;
+    height: fit-content;
+    display: flex;
+    flex-direction: column;
+}
+
+    .node-buttons > div {
+        transform: translateY(-50%);
+    }
+
+        .node-buttons > div .icon-button {
+            cursor: pointer;
+        }
+
 .left-input {
     position: absolute;
     left: -5px;

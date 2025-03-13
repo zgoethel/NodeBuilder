@@ -1,8 +1,39 @@
 @inject IServiceProvider sp
 
-<div class="p-3" style="position: relative;height: 100vh;">
+<div class="d-flex flex-column" style="position: relative;height: 100vh;">
 
-    <GraphPane Style="position: absolute;left: 0;top: 0;width: 100%;height: 100%;" @ref="@graphPane">
+    <div class="d-flex flex-row gap-2 px-3 py-1 bg-light align-items-center">
+
+        <div class="btn-group" role="group">
+            <button type="button" class="btn btn-outline-dark">Tokens</button>
+            <button type="button" class="btn btn-outline-dark">Add</button>
+            <div class="btn-group" role="group">
+                <button id="btnGroupDrop1" type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Dropdown
+                </button>
+                <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+                    <a class="dropdown-item" href="#">Dropdown link</a>
+                    <a class="dropdown-item" href="#">Dropdown link</a>
+                </div>
+            </div>
+        </div>
+
+        <select class="form-select border border-dark shadow">
+            <option>Production A</option>
+            <option>Production B</option>
+            <option>Production C</option>
+        </select>
+
+        <div class="ms-auto border border-dark h-100">
+        </div>
+
+        <button class="btn btn-primary">Save</button>
+
+        <button class="btn btn-outline-dark">Export</button>
+
+    </div>
+
+    <GraphPane Class="flex-grow-1 flex-shrink-1" @ref="@graphPane">
 
         <DragContainer>
             <GraphNode Id="start-node" Class="pe-0 bg-dark text-light" Style="white-space: nowrap;" HeightCm="1" RightOutput>
@@ -22,7 +53,7 @@
         {
             var i = _i;
 
-            <DragContainer InitialPosition="(i * 110 + 110, i * 110 + 110)">
+            <DragContainer InitialPosition="(i * 110 + 130, i * 110 + 130)">
                 <GraphNode Id="@($"node-{i}")" Style="white-space: nowrap;" HeightCm="1" LeftInput RightOutput>
 
                     <h5 class="m-0">Node @i</h5>

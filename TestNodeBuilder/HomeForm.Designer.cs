@@ -51,6 +51,7 @@
             Name = "HomeForm";
             Opacity = 0D;
             Text = "Node Builder";
+            Move += HomeForm_Move;
             ResumeLayout(false);
         }
 

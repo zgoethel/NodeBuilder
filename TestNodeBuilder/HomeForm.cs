@@ -22,6 +22,14 @@ public partial class HomeForm : Form
         {
             blazorWebView1.WebView.CoreWebView2.Settings.IsPinchZoomEnabled = false;
             blazorWebView1.WebView.CoreWebView2.Settings.IsSwipeNavigationEnabled = false;
+            blazorWebView1.WebView.CoreWebView2.Settings.IsZoomControlEnabled = false;
         };
+    }
+
+    private void HomeForm_Move(object sender, EventArgs e)
+    {
+        // Resize to fix issue where select items don't move with window
+        Width += 1;
+        Width -= 1;
     }
 }

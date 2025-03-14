@@ -5,6 +5,20 @@ This project aims to be a frontend to a set of parsing utilities. It implements 
 
 UI editing features allow simple interactive design of grammar elements.
 
+# `2025-03-13`
+
+The grammar design frontend uses a blend of Windows Forms dialogs and WebView2 panes hosting Blazor components.
+
+Nodes are draggable in the graph editing pane. The pane itself is scalable and pannable. Nodes are drawn as HTML content placed absolutely in the graph editing pane. SVG arcs are drawn from node handle to node handle by querying the DOM for the client positions of node handle anchors.
+
+Grammar tokens will eventually live in the "Tokens" form. For now, there is a regex editing and testing modal built on the included regular expression implementation.
+
+![Interactive nodes and base forms for describing token sets](https://i.imgur.com/UP4UlW3.png)
+
+_Interactive nodes and base forms for describing token sets_
+
+# `2025-03-02`
+
 ## Stack Usage
 
 Parsing execution is trampolined and an execution queue and stack are maintained in the heap.

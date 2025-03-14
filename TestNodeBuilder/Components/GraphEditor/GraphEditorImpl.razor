@@ -1,6 +1,11 @@
-﻿<div class="position-relative d-flex flex-column w-100 h-100 @Class" style="@Style">
+﻿@inject IServiceProvider sp
 
-    <GraphEditorToolbar @ref="@toolbar" />
+<CascadingValue Value="@this">
+
+<div class="position-relative d-flex flex-column w-100 h-100 @Class" style="@Style">
+
+    <GraphEditorToolbar @ref="@toolbar"
+        OnTokensClicked="@EditTokens" />
 
     <GraphPane Class="flex-grow-1 flex-shrink-1" @ref="@pane">
 
@@ -9,6 +14,8 @@
     </GraphPane>
 
 </div>
+
+</CascadingValue>
 
 @code {
     [Parameter]
@@ -25,4 +32,21 @@
 
     private GraphPane? pane;
     public GraphPane Pane => pane ?? throw new Exception("Graph pane is not ready yet");
+
+    public TokensForm? TokensForm { get; private set; }
+
+    private async Task EditTokens()
+    {
+        using (TokensForm = sp.GetRequiredService<TokensForm>())
+        {
+            TokensForm.Disposed += (_, __) =>
+            {
+                TokensForm = null;
+                _ = InvokeAsync(StateHasChanged);
+            };
+
+            //TokensForm.Show();
+            _ = await TokensForm.ShowDialogAsync();
+        }
+    }
 }

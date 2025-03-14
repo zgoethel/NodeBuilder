@@ -1,0 +1,41 @@
+@inject IServiceProvider sp
+
+<div class="p-3">
+
+    <h5>Tokens</h5>
+
+    <div class="d-flex flex-row gap-2 align-items-center">
+
+        <span><strong>Value:</strong> @token</span>
+
+        <button type="button" class="btn btn-dark" @onclick="@(async () => await EditToken(token))">
+            @SD.Icons.BiPencil()
+        </button>
+
+    </div>
+
+</div>
+
+@code {
+    [Parameter]
+    public TokensForm? Form { get; set; }
+
+    private string token = "[a-z]+";
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+
+        if (firstRender)
+        {
+            Form!.Opacity = 1.0;
+        }
+    }
+
+    //TODO
+    private async Task EditToken(string regex)
+    {
+        var nextForm = sp.GetRequiredService<EditTokenForm>();
+        token = await nextForm.ShowEditTokenForm(regex, (_) => "") ?? token;
+    }
+}

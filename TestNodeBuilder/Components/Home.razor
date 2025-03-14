@@ -1,5 +1,3 @@
-@inject IServiceProvider sp
-
 <GraphEditorImpl Style="height: 100vh !important;" @ref="@graphEditor">
 
     <DragContainer>
@@ -84,12 +82,5 @@
         });
 
         await graphEditor.Pane.RebuildPlottedEdges();
-    }
-
-    //TODO
-    private async Task EditToken(string regex)
-    {
-        var nextForm = sp.GetRequiredService<EditTokenForm>();
-        var token = await nextForm.ShowEditTokenForm(regex, (_) => "Invalid");
     }
 }

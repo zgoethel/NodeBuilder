@@ -4,7 +4,8 @@
 
         <button type="button"
             class="btn btn-outline-dark d-flex flex-row gap-2 align-items-center"
-            @onclick="@OnTokensClicked">
+            @onclick="@OnTokensClicked"
+            disabled="@(GraphEditor?.TokensForm is not null)">
 
             @SD.Icons.BiRegex()
             Tokens
@@ -130,6 +131,9 @@
 @code {
     //TODO
     private string activeProduction = "Top Level";
+
+    [CascadingParameter]
+    public GraphEditorImpl? GraphEditor { get; set; }
 
     [Parameter]
     public EventCallback OnTokensClicked { get; set; }

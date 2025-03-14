@@ -161,6 +161,7 @@
             Controls.Add(testRegexGroup);
             FormBorderStyle = FormBorderStyle.FixedToolWindow;
             Name = "EditTokenForm";
+            StartPosition = FormStartPosition.CenterParent;
             Text = "Edit Token";
             Load += EditTokenForm_Load;
             testRegexGroup.ResumeLayout(false);

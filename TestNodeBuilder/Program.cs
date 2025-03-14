@@ -150,6 +150,7 @@ internal static class Program
 
         services.AddWindowsFormsBlazorWebView();
         services.AddTransient<HomeForm>();
+        services.AddTransient<TokensForm>();
         services.AddTransient<EditTokenForm>();
 
         services.AddTransient<GraphEdgeContext>();
